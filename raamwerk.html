@@ -184,7 +184,12 @@
             data = data.trim('\n');
             examples = data.split('\n');
             for (var line of examples) {
-              filelist += `<div style="margin: 2px 0;"><a href="#" onclick="getDesAndCode('${line}')">${line.split('.')[0]}</a></div>`;
+              if (line.includes('---')) {
+                var ns = line.split('---').map(a => a.trim());
+                filelist += `<div style="margin: 2px 0;"><a href="#" onclick="getDesAndCode('${ns[0]}')">${ns[1]}</a></div>`
+              }
+              else
+                filelist += `<div style="margin: 2px 0;"><a href="#" onclick="getDesAndCode('${line}')">${line.split('.')[0]}</a></div>`;
             }
             const home = `<a href="index.html" class="button">Home</a><br>`
             var links = `<h2>Voorbeelden</h2>${filelist}`
