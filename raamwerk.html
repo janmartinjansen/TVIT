@@ -186,7 +186,7 @@
             for (var line of examples) {
               filelist += `<div style="margin: 2px 0;"><a href="#" onclick="getDesAndCode('${line}')">${line.split('.')[0]}</a></div>`;
             }
-            const home = `<a href="../index.html" class="button">Home</a><br>`
+            const home = `<a href="index.html" class="button">Home</a><br>`
             var links = `<h2>Voorbeelden</h2>${filelist}`
             default_side = home + links;
             document.getElementById('sidebar').innerHTML = default_side;
