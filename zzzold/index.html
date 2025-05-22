@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Editor Component</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+    <script>
+        // Plak hier de code van je SvgEditor webcomponent
+        // ...
+    </script>
+</head>
+<body>
+    <h1>SVG Editor Component</h1>
+    <svg-editor></svg-editor>
+    <script>
+        // Voeg hier de SvgEditor-code toe, of laad deze via een extern scriptbestand
+        class SvgEditor extends HTMLElement {
+            constructor() {
+                super();
+
+                // Maak een shadow DOM
+                this.attachShadow({ mode: 'open' });
+
+                // Voeg de HTML structuur toe
+                this.shadowRoot.innerHTML = `
+                    <style>
+                        :host {
+                            display: block;
+                            font-family: Arial, sans-serif;
+                        }
+                        #editor {
+                            height: 300px;
+                            border: 1px solid #ccc;
+                            margin-bottom: 10px;
+                        }
+                        #output {
+                            border: 1px solid #ccc;
+                            padding: 10px;
+                        }
+                        button {
+                            margin-bottom: 10px;
+                        }
+                    </style>
+                    <div id="editor"></div>
+                    <button id="run">Run</button>
+                    <div id="output"></div>
+                `;
+
+                // Bind elementen
+                this.editorContainer = this.shadowRoot.querySelector('#editor');
+                this.runButton = this.shadowRoot.querySelector('#run');
+                this.outputDiv = this.shadowRoot.querySelector('#output');
+            }
+
+            connectedCallback() {
+                // Initialiseer de Ace editor
+                this.editor = ace.edit(this.editorContainer);
+                this.editor.setTheme("ace/theme/monokai");
+                this.editor.session.setMode("ace/mode/javascript");
+                this.editor.setValue('<svg width="100" height="100"><circle cx="50" cy="50" r="40" fill="blue" /></svg>');
+
+                // Voeg een klikhandler toe aan de knop
+                this.runButton.addEventListener('click', () => this.runCode());
+            }
+
+            runCode() {
+                // Haal de inhoud van de editor op
+                const code = this.editor.getValue();
+
+                try {
+                    // Genereer SVG door de code als functie uit te voeren
+                    const generateSvg = new Function('return ' + code)();
+                    if (typeof generateSvg === 'function') {
+                        const svgContent = generateSvg();
+                        this.outputDiv.innerHTML = svgContent;
+                    } else {
+                        this.outputDiv.textContent = 'De code moet een functie retourneren.';
+                    }
+                } catch (error) {
+                    this.outputDiv.textContent = 'Fout in de code: ' + error.message;
+                }
+            }
+        }
+
+        // Registreer het custom element
+        customElements.define('svg-editor', SvgEditor);
+    </script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Onderwijs Raamwerk met Markdown</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        #container {
+            display: flex;
+            height: 100%;
+        }
+
+        #sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-right: 1px solid #ccc;
+        }
+
+        #content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .tab-buttons button {
+            padding: 10px 20px;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .tab-content {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .tab {
+            display: none;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        #codeEditorOpgave {
+            height: 300px;
+        }
+    </style>
+    <script language="javascript" type="text/javascript" src="./pyparselib.js"></script>
+</head>
+<body>
+    <div id="container">
+        <div id="sidebar">
+            <h2>Inhoudsopgave</h2>
+            <ul>
+                <li><a href="#" onclick="showContent('opgave')">Opgave 1</a></li>
+                <li><a href="#" onclick="showContent('opgave')">Opgave 2</a></li>
+                <li><a href="#" onclick="showContent('opgave')">Opgave 3</a></li>
+            </ul>
+        </div>
+        <div id="content">
+            <div id="opgave" class="opgave-content">
+                <div class="tab-buttons">
+                    <button onclick="openTab('opgave', 'beschrijving')">Beschrijving</button>
+                    <button onclick="openTab('opgave', 'code')">Code</button>
+                    <button onclick="openTabOutput('opgave')">Run</button>
+                </div>
+                <div id="opgave-beschrijving" class="tab-content tab active"></div>
+                <div id="opgave-code" class="tab-content tab">
+                    <div id="codeEditorOpgave"></div>
+                </div>
+                <div id="opgave-output" class="tab-content tab">
+                    <div id="outputOpgave">
+                  </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@2.0.0/marked.min.js"></script>
+    <script language="javascript" type="text/javascript" src="./viz.js"></script>
+    <script src="./skulpt.min.js" type="text/javascript"></script>
+    <script src="./skulpt-stdlib.js" type="text/javascript"></script>
+    <script>
+//                       <auto-input></auto-input>
+        let editor = ace.edit("codeEditorOpgave");
+        editor.setOption("maxLines", 80);
+        //editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/python");
+
+        var outputPart = document.getElementById("outputOpgave");
+        outputPart.innerHTML = '<parse-component></parse-component>';
+        //outputPart.innerHTML = '<pdauto-input></pdauto-input>';
+        //outputPart.innerHTML = '<pdauto-input></pdauto-input>';
+
+        function renderMarkdown(markdown) {
+            return marked(markdown);
+        }
+
+        function showContent(opgaveId) {
+            let opgaven = document.querySelectorAll('.opgave-content');
+            opgaven.forEach(opgave => opgave.style.display = 'none');
+            document.getElementById(opgaveId).style.display = 'block';
+            openTab(opgaveId, 'beschrijving');
+
+            // Voeg de Markdown-inhoud toe aan de beschrijving van de opdracht.
+            let markdownContent = `hoppatee`;
+            getOpgave('opgave.txt');
+            getCode('python.gram');
+            //document.getElementById(`${opgaveId}-beschrijving`).innerHTML = renderMarkdown(markdownContent);
+        }
+
+        function openTab(opgaveId, tabId) {
+            let tabs = document.querySelectorAll(`#${opgaveId} .tab`);
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`${opgaveId}-${tabId}`).classList.add('active');
+        }
+
+        function openTabOutput(opgaveId) {
+            let tabs = document.querySelectorAll(`#${opgaveId} .tab`);
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`opgave-output`).classList.add('active');
+            var opdata = editor.getValue();
+            setData(opdata);
+        }
+
+        function getOpgave(name) {
+          fetch(name)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Netwerk response was niet ok');
+              }
+              return response.text(); // Haal de inhoud als tekst op
+            })
+            .then(data => {
+              //console.log(data); // Doe iets met de data (bv. weergeven in een element)
+              document.getElementById('opgave-beschrijving').innerHTML = renderMarkdown(data);
+            })
+            .catch(error => {
+              console.error('Er was een probleem bij het ophalen van het bestand:', error);
+            });
+          }
+
+          function getCode(name) {
+            fetch(name)
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Netwerk response was niet ok');
+                }
+                return response.text(); // Haal de inhoud als tekst op
+              })
+              .then(data => {
+                //console.log(data); // Doe iets met de data (bv. weergeven in een element)
+                editor.setValue(data);
+              })
+              .catch(error => {
+                console.error('Er was een probleem bij het ophalen van het bestand:', error);
+              });
+            }
+
+        showContent('opgave');
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Letterkleur wijzigen</title>
+</head>
+<body>
+    <p id="myText">Dit is een voorbeeldtekst.</p>
+    <script>
+        const tekstElement = document.getElementById("myText");
+        let tekst = tekstElement.textContent;
+        let nieuweTekst = "";
+
+        for (let i = 0; i < tekst.length; i++) {
+            if (i === 7) { // Index van de letter die je wilt inkleuren
+                nieuweTekst += "<span style='color: red;'>" + tekst[i] + "</span>";
+            } else {
+                nieuweTekst += tekst[i];
+            }
+        }
+        tekstElement.innerHTML = nieuweTekst;
+    </script>
+</body>
+</html>

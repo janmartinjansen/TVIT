@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Web Component</title>
+</head>
+<body>
+    <h1>Minimal Web Component</h1>
+    <p>Voer hieronder een getal in en klik op de knop om het te verhogen met 1:</p>
+    <increment-input></increment-input>
+
+    <script>
+        class IncrementInput extends HTMLElement {
+            constructor() {
+                super();
+
+                // Maak shadow DOM
+                this.attachShadow({ mode: 'open' });
+
+                // Creëer elementen
+                const style = document.createElement('style');
+                style.textContent = `
+                    :host {
+                        display: block;
+                        font-family: Arial, sans-serif;
+                        margin: 10px 0;
+                    }
+                    input {
+                        margin-right: 10px;
+                        padding: 5px;
+                    }
+                    button {
+                        padding: 5px 10px;
+                        cursor: pointer;
+                    }
+                    #output {
+                        margin-top: 10px;
+                        font-weight: bold;
+                    }
+                `;
+
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = 'input';
+                input.placeholder = 'Voer een getal in';
+
+                const button = document.createElement('button');
+                button.id = 'increment';
+                button.textContent = 'Increment';
+
+                const output = document.createElement('div');
+                output.id = 'output';
+
+                // Voeg elementen toe aan shadow DOM
+                this.shadowRoot.append(input, button, output);
+
+                // Elementen binden
+                this.input = input;
+                this.button = button;
+                this.output = output;
+            }
+
+            connectedCallback() {
+                // Voeg event listener toe
+                this.button.addEventListener('click', () => this.incrementValue());
+            }
+
+            incrementValue() {
+                const inputValue = parseFloat(this.input.value);
+                if (!isNaN(inputValue)) {
+                    this.output.textContent = `Resultaat: ${inputValue + 1}`;
+                } else {
+                    this.output.textContent = 'Voer een geldig getal in.';
+                }
+            }
+        }
+
+        // Registreer custom element
+        customElements.define('increment-input', IncrementInput);
+    </script>
+</body>
+</html>

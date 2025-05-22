@@ -1,0 +1,7 @@
+bipush 7
+bipush 8
+bipush 4
+iadd
+imult
+print
+stop

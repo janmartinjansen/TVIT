@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Raamwerk TVIT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            background-color: #f4f6f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #container {
+            display: flex;
+            height: 100%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            background-color: white;
+        }
+
+        #sidebar {
+            width: 200px;
+            background-color: #e0e0e0;
+            padding: 8px;
+            border-right: 1px solid #ddd;
+            font-size: 0.9em;
+        }
+
+        #content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        #sidebar a {
+            text-decoration: none;
+            color: #007acc;
+            display: block;
+            padding: 4px 0;
+        }
+
+        #sidebar a:hover {
+            text-decoration: underline;
+        }
+
+        .tab-buttons button {
+            padding: 10px 20px;
+            margin-right: 5px;
+            cursor: pointer;
+            background-color: #007acc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .tab-buttons button:hover {
+            background-color: #005fa3;
+        }
+
+        .tab-content {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab {
+            display: none;
+        }
+
+        .tab.active {
+            display: block;
+            border: 2px solid #007acc;
+        }
+
+        #codeEditorOpgave {
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="sidebar">
+        </div>
+        <div id="content">
+            <div id="opgave" class="opgave-content">
+                <div class="tab-buttons">
+                  <button onclick="openTabBes()">Beschrijving</button>
+                  <button onclick="openTabCode()">Code</button>
+                    <button onclick="openTabOutput()">Run</button>
+                </div>
+                <div id="opgave-beschrijving" class="tab-content tab active"></div>
+                <div id="opgave-code" class="tab-content tab">
+                    <div id="codeEditorOpgave"></div>
+                </div>
+                <div id="opgave-output" class="tab-content tab">
+                    <div id="outputOpgave">
+                  </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@2.0.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script language="javascript" type="text/javascript" src="./viz.js"></script>
+    <script language="javascript" type="text/javascript" src="./turing.js"></script>
+    <script>
+
+        let editor = ace.edit("codeEditorOpgave");
+
+        var saved_code = new Map();
+        var last_saved;
+        var default_side;
+        var current_model = 'turing';
+
+        editor.setOption("maxLines", 80);
+        //editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/python");
+
+        var outputPart       = document.getElementById("outputOpgave");
+        outputPart.innerHTML = '<turing-comp></turing-comp>';
+        var examples;
+
+        function showContent() {
+            openTabBes();
+        }
+
+        function openTabBes() {
+            let tabs = document.querySelectorAll(`#opgave .tab`);
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`opgave-beschrijving`).classList.add('active');
+        }
+
+        function openTabCode() {
+            let tabs = document.querySelectorAll(`#opgave .tab`);
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`opgave-code`).classList.add('active');
+            editor.renderer.updateFull(true);
+        }
+
+        function openTabOutput() {
+            let tabs = document.querySelectorAll(`#opgave .tab`);
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`opgave-output`).classList.add('active');
+            var newcode = editor.getValue();
+            if (last_saved != newcode) {
+              last_saved = newcode;
+              saved_code.set(genTimeStamp(newcode),newcode);
+              genSavedList();
+              saveToParams(current_model,saved_code);
+            }
+            setData(newcode);
+        }
+
+        function genSavedList() {
+          var slist = '';
+          for (const k of saved_code.keys())
+            slist = `<div style="display:flex; align-items:center; font-size: 0.9em; gap: 4px;">
+              <span style="cursor:pointer; color:blue; font-size: 0.8em;" title="Verwijder" onclick="delItem('${k}')">&#x274C;</span>
+              <span style="cursor:pointer; color:blue; font-size: 0.8em;" title="Hernoem" onclick="changeName('${k}')">&#x270F;&#xFE0F;</span>
+              <a href="#" onclick="getSaved('${k}')">${k}</a>
+           </div>` + slist;
+          slist = `<h2>Opgeslagen</h2>${slist}`
+          document.getElementById('sidebar').innerHTML = default_side + slist;
+        }
+
+        function changeName(name) {
+          let newname = prompt("Rename:", name);
+          if (newname != null && newname != "") {
+            let content = saved_code.get(name);
+            saved_code.delete(name);
+            saved_code.set(newname,content);
+            genSavedList();
+            saveToParams(current_model,saved_code);
+          }
+        }
+
+        function genExamples(data) {
+            var filelist = '';
+            data = data.trim('\n');
+            examples = data.split('\n');
+            for (var line of examples) {
+              filelist += `<div style="margin: 2px 0;"><a href="#" onclick="getDesAndCode('${line}')">${line.split('.')[0]}</a></div>`;
+            }
+            const home = `<a href="../index.html" class="button">Home</a><br>`
+            var links = `<h2>Voorbeelden</h2>${filelist}`
+            default_side = home + links;
+            document.getElementById('sidebar').innerHTML = default_side;
+        }
+
+        function getSaved(key) {
+          var data = saved_code.get(key);
+          editor.setValue(data,-1);
+          last_saved = data;
+          setData(data);
+        }
+
+        function delItem(key) {
+          saved_code.delete(key);
+          genSavedList();
+          saveToParams(current_model,saved_code);
+        }
+
+        function getExamples() {
+          fetch('examples.rm')
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Netwerk response was niet ok');
+              }
+              return response.text(); // Haal de inhoud als tekst op
+            })
+            .then(data => {
+              genExamples(data);
+              getDesAndCode(examples[0]);
+              getFromParams(current_model);
+            })
+            .catch(error => {
+              console.error('Er was een probleem bij het ophalen van het bestand:', error);
+            });
+          }
+
+          function getDesAndCode(name) {
+            getOpgave(name.split('.')[0] + '.md');
+            getCode(name);
+          }
+
+          function getOpgave(name) {
+          fetch(name)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Netwerk response was niet ok');
+              }
+              return response.text(); // Haal de inhoud als tekst op
+            })
+            .then(data => {
+              const htmlOutputString = marked(data);
+              const tempElement = document.createElement('div');
+              tempElement.innerHTML = htmlOutputString;
+              const codeBlocks = tempElement.querySelectorAll('pre code');
+              codeBlocks.forEach(hljs.highlightElement);
+              document.getElementById('opgave-beschrijving').innerHTML = tempElement.innerHTML;
+            })
+            .catch(error => {
+              console.error('Er was een probleem bij het ophalen van het bestand:', error);
+            });
+          }
+
+          function getCode(name) {
+            fetch(name)
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Netwerk response was niet ok');
+                }
+                return response.text(); // Haal de inhoud als tekst op
+              })
+              .then(data => {
+                editor.setValue(data,-1);
+                last_saved = data;
+                setData(data);
+              })
+              .catch(error => {
+                console.error('Er was een probleem bij het ophalen van het bestand:', error);
+              });
+            }
+
+            function genTimeStamp() {
+              const nu = new Date();
+              return `${nu.getFullYear()}-${nu.getMonth() + 1}-${nu.getDate()} ${nu.getHours()}:${nu.getMinutes()}:${nu.getSeconds()}`;
+            }
+
+          function saveToParams(name, map)  {
+              try {
+                const resultString = JSON.stringify(Array.from(map.entries()));
+                localStorage.setItem(name, resultString);
+              } catch (error) {
+                  console.error(`Fout bij het opslaan van resultaten voor "${name}":`, error);
+            }
+          }
+
+          function getFromParams(name)  {
+            try {
+              const resultString = localStorage.getItem(name);
+              if (resultString) {
+                const results = JSON.parse(resultString);
+                saved_code = new Map(results);
+                genSavedList();
+              } else {
+                console.log(`Geen resultaten gevonden voor "${name}".`);
+              }
+            } catch (error) {
+              console.error(`Fout bij het ophalen van resultaten voor "${name}":`, error);
+            }
+          };
+
+        getExamples();
+        showContent();
+ 
+    </script>
+</body>
+</html>

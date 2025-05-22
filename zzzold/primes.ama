@@ -1,0 +1,5 @@
+primes  = sieve [2..]
+
+sieve xs = x : sieve [y| y <- ts; y % x ~=0] where (x:ts) = xs
+
+primetwins = [(x,y)| x,y <- primes, tl primes; x +2 = y]

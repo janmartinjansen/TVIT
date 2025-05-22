@@ -1,0 +1,28 @@
+function    -> def iden '(' args? ')' ':' newline block
+
+args        -> iden (',' iden)*
+
+block       -> indent statement+ dedent
+
+statement   -> complexstat | simplestat newline
+
+simplestat  -> retstat | assign
+assign      -> iden '=' expr
+retstat     -> return expr
+
+complexstat -> ifStat | whileStat
+
+ifStat      -> if cond ':' newline block elsePart?
+elsePart    -> else ':' newline block
+
+whileStat   -> while cond ':' newline block
+
+cond        -> iden relop expr
+relop       -> '==' | '<' | '<=' | '>' | '>=' | '!='
+
+expr        -> term (('+' | '-') term)*
+term        -> factor (('*' | '/') factor)*
+factor      -> num | idenorcall | '(' expr ')'
+
+idenorcall  -> iden ('(' callargs? ')')?
+callargs    -> expr (',' expr)*

@@ -1,0 +1,20 @@
+  bipush 10
+  call 1 0 1
+  print
+  stop
+1 iload 0
+  bipush 2
+  isub
+  iflt 2
+  iload 0
+  bipush 1
+  isub
+  call 1 0 1
+  iload 0
+  bipush 2
+  isub
+  call 1 0 1
+  iadd
+  ireturn
+2 bipush 1
+  ireturn

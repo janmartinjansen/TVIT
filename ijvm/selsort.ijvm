@@ -1,0 +1,83 @@
+	call 0 2 5
+	pop
+	stop
+5	bipush 5
+	new
+	istore 0
+	bipush 5
+	istore 1
+	bipush 6
+	bipush 0
+	iload 0
+	iastore
+	bipush 9
+	bipush 1
+	iload 0
+	iastore
+	bipush 3
+	bipush 2
+	iload 0
+	iastore
+	bipush 7
+	bipush 3
+	iload 0
+	iastore
+	bipush 2
+	bipush 4
+	iload 0
+	iastore
+  iload 0
+	printmem
+	iload 0
+	iload 1
+	call 2 4 10
+	printmem
+  bipush 77
+  ireturn
+10 bipush 0
+	istore 2
+20 iload 2
+  iload 1
+  isub
+	ifeq 50
+	iload 2
+	istore 4
+	iload 2
+	bipush 1
+	iadd
+	istore 3
+30 iload 3
+	iload 1
+	isub
+	ifeq 40
+	iload 0
+	iload 3
+	iaload
+	iload 0
+	iload 4
+	iaload
+	isub
+	iflt 45
+	goto 47
+45 iload 3
+    istore 4
+47 iinc 3 1
+    goto 30
+40 iload 0
+    iload 2
+	iaload
+	istore 5
+	iload 0
+	iload 4
+	iaload
+	iload 0
+	iload 2
+	iastore
+	iload 5
+	iload 0
+	iload 4
+	iastore
+	iinc 2 1
+	goto 20
+50 iload 0
+    ireturn

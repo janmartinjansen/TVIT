@@ -1,0 +1,40 @@
+<html>
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>State machine visualizer</title>
+  </head>
+<body>
+
+<auto-display id="inhoud">
+  q1 b q1
+  q1 a q2
+  q2 a q3
+  q2 c q4
+  q2 b q1
+  q3 a q3
+  q3 b q3
+  start q1
+  end q3 q4
+</auto-display>
+
+<button type="button"id="replace">Replace</button>
+
+</body>
+
+<script>
+  var btn = document.getElementById("replace");
+  btn.addEventListener('click',setNew);
+
+  function setNew() {
+    var check = document.getElementById("inhoud");
+    inhoud.textContent = "q1 a q2\nstart q1\nend q2";
+  }
+
+</script>
+
+<script language="javascript" type="text/javascript" src="./viz.js"></script>
+<script language="javascript" type="text/javascript" src="./autodisplay.js"></script>
+
+
+
+</html>

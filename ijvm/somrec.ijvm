@@ -1,0 +1,18 @@
+    bipush 10
+    call 1 0 1
+    printstack
+    print
+    stop
+1   printstack
+    iload 0
+    ifeq 2
+    iload 0
+    dup
+    bipush 1
+    isub
+    call 1 0 1
+    iadd
+    printstack
+    ireturn
+2   bipush 0
+    ireturn

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Webcomponent Voorbeeld</title>
+</head>
+<body>
+  <persoon-info naam="JM" leeftijd="30">Hallo</persoon-info>
+  <button id="verhoogLeeftijd">Verhoog Leeftijd</button>
+  <button id="test">Test</button>
+
+  <script>
+    const pc = document.querySelector('persoon-info');
+    const verhoogLeeftijdKnop = document.getElementById('verhoogLeeftijd');
+
+    verhoogLeeftijdKnop.addEventListener('click', () => {
+      let leeftijd = parseInt(pc.getAttribute('leeftijd')) || 0;
+      pc.setAttribute('leeftijd', leeftijd + 1);
+    });
+
+    const test = document.getElementById('test');
+
+    test.addEventListener('click', () => {
+      var mt = pc.textContent;
+      var leeftijd = pc.shadowRoot.getElementById('leeftijd');
+      leeftijd.textContent = 'Leeftijd: ' + 99;
+      pc.name.textContent = 'Naam: ' + mt;
+      alert('hoppa');
+    });
+  </script>
+
+  <script>
+    class PersoonInfo extends HTMLElement {
+      constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.leeftijd = this.shadowRoot.getElementById('leeftijd');
+        this.name     = this.shadowRoot.getElementById('naam');
+      }
+
+      connectedCallback() {
+        this.render();
+      }
+
+      static get observedAttributes() {
+        return ['naam', 'leeftijd'];
+      }
+
+      attributeChangedCallback(naam, oud, nieuw) {
+        this.render();
+      }
+
+      render() {
+        const naam = this.getAttribute('naam') || 'Onbekend';
+        const leeftijd = this.getAttribute('leeftijd') || 'Onbekend';
+
+        this.shadowRoot.innerHTML = `
+          <style>
+            p {
+              font-family: sans-serif;
+            }
+          </style>
+          <p id="naam">Naam: ${naam}</p>
+          <p id="leeftijd">Leeftijd: ${leeftijd}</p>
+          <button id="t2">Test2</button>
+        `;
+      }
+    }
+
+    customElements.define('persoon-info', PersoonInfo);
+  </script>
+</body>
+</html>

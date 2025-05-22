@@ -1,0 +1,8 @@
+    bipush 6
+    call 1 0 33
+    print
+    stop
+33	iload 0
+    dup
+    imult
+    ireturn

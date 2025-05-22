@@ -1,0 +1,43 @@
+<html>
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>State machine visualizer</title>
+  </head>
+<body>
+
+
+
+Enter your state machine below:
+<br>
+<textarea id="inputdata" rows="20" cols="80" width="100%" wrap="off">
+  q1 b q1
+  q1 a q2
+  q2 a q3
+  q2 b q1
+  q3 a q3
+  q3 b q3
+  start q1
+  end q3
+</textarea>
+<p>
+
+  <button onclick="updatePict()">Generate</button>
+  <br>
+  <input type="text" id="str">
+  <button onclick="checkString()">Check</button>
+  <div id="result">Result of check</div>
+  <br>
+  <hr>
+  <div id="picture">
+    The result will appear here.
+  </div>
+
+</body>
+
+<!-- Defer loading of javascript by placing these tags at the tail end of the document -->
+<script language="javascript" type="text/javascript" src="./viz.js"></script>
+<script language="javascript" type="text/javascript" src="./automaat.js"></script>
+
+
+
+</html>

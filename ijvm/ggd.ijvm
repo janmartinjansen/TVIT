@@ -1,0 +1,29 @@
+  bipush 27
+  bipush 15
+  call 2 0 1
+  print
+  stop
+1 iload 0
+  ifeq 2
+  iload 1
+  ifeq 3
+  iload 1
+  iload 0
+  isub
+  iflt 4
+  iload 0
+  iload 1
+  iload 0
+  isub
+  call 2 0 1
+  ireturn
+2 iload 1
+  ireturn
+3 iload 0
+  ireturn
+4 iload 0
+  iload 1
+  isub
+  iload 1
+  call 2 0 1
+  ireturn

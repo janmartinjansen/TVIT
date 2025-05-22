@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mijn Webcomponent met Input</title>
+</head>
+<body>
+
+  <mijn-groet></mijn-groet>
+
+  <script>
+    class MijnGroet extends HTMLElement {
+      constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+
+        // Voeg een input veld toe
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Voer je naam in';
+        this.shadowRoot.appendChild(input);
+
+        // Voeg een knop toe
+        const button = document.createElement('button');
+        button.textContent = 'Groet';
+        this.shadowRoot.appendChild(button);
+
+        // Voeg een paragraaf toe voor de groet
+        const p = document.createElement('p');
+        this.shadowRoot.appendChild(p);
+
+        // Event listener voor de knop
+        button.addEventListener('click', () => {
+          const naam = input.value;
+          p.textContent = `Hallo, ${naam}!`;
+        });
+      }
+    }
+
+    customElements.define('mijn-groet', MijnGroet);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+   bipush 4
+   bipush 1
+   bipush 2
+   bipush 3
+   call 4 0 33
+   pop
+   stop
+33 iload 0
+   ifeq 44
+   iload 0
+   bipush 1
+   isub
+   iload 1
+   iload 3
+   iload 2
+   call 4 0 33
+   pop
+   iload 1
+   print
+   iload 2
+   print
+   iload 0
+   bipush 1
+   isub
+   iload 3
+   iload 2
+   iload 1
+   call 4 0 33
+   pop
+   bipush 77
+   ireturn
+44 bipush 66
+   ireturn

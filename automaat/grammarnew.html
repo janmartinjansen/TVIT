@@ -1,0 +1,1175 @@
+<html>
+<head>
+<script src="./skulpt.min.js" type="text/javascript"></script>
+<script src="./skulpt-stdlib.js" type="text/javascript"></script>
+<script language="javascript" type="text/javascript" src="./viz.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/ace.js" type="text/javascript" charset="utf-8"></script>
+
+<title>ParseTree Visualizer</title>
+
+</head>
+
+<body>
+
+
+<h3>Type your grammar here and the expression to parse in the input next editor</h3>
+
+<pre id="inputdata" >
+function    -> def iden '(' args? ')' ':' newline block
+
+args        -> iden (',' iden)*
+
+block       -> indent statement+ dedent
+
+statement   -> complexstat | simplestat newline
+
+simplestat  -> retstat | assign
+assign      -> iden '=' expr
+retstat     -> return expr
+
+complexstat -> ifStat | whileStat
+
+ifStat      -> if cond ':' newline block elsePart?
+elsePart    -> else ':' newline block
+
+whileStat   -> while cond ':' newline block
+
+cond        -> iden relop expr
+relop       -> '==' | '<' | '<=' | '>' | '>=' | '!='
+
+expr        -> term (('+' | '-') term)*
+term        -> factor (('*' | '/') factor)*
+factor      -> num | idenorcall | '(' expr ')'
+
+idenorcall  -> iden ('(' callargs? ')')?
+callargs    -> expr (',' expr)*
+
+----
+
+def fac(n):
+  if n < 1:
+    return 0
+  else:
+    return n * fac(n-1)
+</pre>
+
+<button type="button" onclick="runit()">Draw Parsetree</button>
+
+<pre id="output" />
+</body>
+
+<script type="text/javascript">
+//<button type="button" onclick="getCode()">Load Code</button>
+var editor = ace.edit("inputdata");
+
+
+editor.setOption("minLines", 10);
+editor.setOption("maxLines", 40);
+editor.getSession().setMode("ace/mode/python");
+editor.setAutoScrollEditorIntoView(true);
+
+function outf(text) {
+    var mypre = document.getElementById("output");
+    var svg = Viz(text, "svg");
+    mypre.innerHTML = svg;
+}
+
+function builtinRead(x) {
+    if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+            throw "File not found: '" + x + "'";
+    return Sk.builtinFiles["files"][x];
+}
+
+var program = null
+function runit() {
+  if (program == null) {
+     //program = pycode.slice(2); //getCode("pygram.py");
+     //pycode = makeMultiStr(pycode);
+     program = document.getElementById("yourcode").value;
+     //testlines(program.split('\n'),pycode.split('\n'));
+     //var len = Math.min(pycode.length,program.length);
+     //for (var i = 0;i < 100;i++) {if (program[i] != pycode[i]) console.log(i,pycode[i],program[i]); }
+     //console.log(program);
+  }
+  var grammar = editor.getValue(),fgrammar = '';
+   var finput = '';
+   var mypre = document.getElementById("output");
+   var first = true;
+   for (var line of grammar.split('\n')) {
+        if (line.length != 0) {
+            if (line.startsWith('----')) first = false;
+            else if (first)   fgrammar += line + '\n';
+            else finput += line + '\n';
+        }
+   }
+   grammar    = makeStr(fgrammar)
+   var input  = makeStr(finput)
+   pcode = 'print(genAST(' + grammar +',' + input + '))';
+
+   var myprog = program + pcode
+   //console.log(myprog);
+   mypre.innerHTML = '';
+   Sk.pre = "output";
+   Sk.configure({output:outf, read:builtinRead});
+
+   var myPromise = Sk.misceval.asyncToPromise(function() {
+       return Sk.importMainWithBody("<stdin>", false, myprog, true);
+   });
+   myPromise.then(function(mod) {
+       console.log('success');
+   },
+       function(err) {
+       console.log(err.toString());
+   }); 
+ }
+
+function testlines(ls1,ls2) {
+    var len = Math.min(ls1.length,ls2.length);
+    console.log('showing lines');
+    for (var i = 0;i < len;i++) {
+        console.log(ls1[i]);
+        console.log(ls2[i]);
+    }
+    console.log('end showing lines');
+}
+
+function makeMultiStr(txt) {
+    res = '';
+    var lines = txt.split('\n');
+    alert(lines.length)
+    for (line of lines) {
+        res += makeStrNq(line) + '\n';
+    return res;
+    }
+}
+function makeStr(txt) {
+  res = "'"
+  for (var t of txt) {
+    if (t == '\n') {
+      res += "\\n"
+    }
+    else if (t == '\'') {
+      res += "\\'"
+    }
+    else res += t
+  }
+  res += "'"
+  return res
+}
+
+function makeStrNq(txt) {
+  var res = "";
+  for (var t of txt) {
+    if (t == '\n') {
+      res += "\\n"
+    }
+    else if (t == '\'') {
+      res += "\\'"
+    }
+    else res += t
+  }
+  return res
+}
+
+function getCode(name) {
+    fetch(name)
+        .then(response => {
+        if (!response.ok) {
+            throw new Error('Netwerk response was niet ok');
+        }
+        return response.text(); // Haal de inhoud als tekst op
+        })
+        .then(data => {
+          console.log(data); // Doe iets met de data (bv. weergeven in een element)
+          pycode = data;
+        })
+        .catch(error => {
+        console.error('Er was een probleem bij het ophalen van het bestand:', error);
+        });
+}
+ var pycode = 
+ `class Parser:
+
+    def __init__(self,t):
+        self.pos         = 0
+        self.indent      = [0]
+        self.undents     = []
+        self.nextindent  = False
+        self.input       = t
+        self.curtype     = 'none'
+        self.predefterms = []
+        self.begindelim  = '\''
+        self.enddelim    = '\''
+        self.curtok      = self.gettoken()
+
+    def setPredefterms(self,ts):
+        self.predefterms = ts
+        self.pos = 0
+        self.gettoken()
+
+    def setDelim(self,o,e):
+        self.begindelim = o
+        self.enddelim   = e
+
+    def gettoken(self):
+        if self.nextindent:
+            self.nextindent = False
+            self.curtok = 'indent'
+            self.toktype = 'indent'
+            return 'indent'
+        if len(self.undents) > 0:
+            self.undents.pop()
+            self.toktype = 'dedent'
+            self.curtok = 'dedent'
+            return 'dedent'
+        while self.pos < len(self.input) and self.input[self.pos] == ' ':
+            self.pos += 1
+        start = self.pos
+        if self.pos == len(self.input):
+            self.toktype = 'eof'
+            self.curtok = 'eof'
+            return 'eof'
+        elif self.input[start] == self.begindelim:
+            self.pos += 1
+            while  self.pos < len(self.input) and self.input[self.pos] != self.enddelim:
+                self.pos += 1
+            res = self.input[start+1:self.pos]
+            self.pos += 1
+            self.toktype = 'str'
+            self.curtok = res
+            return res
+        elif self.input[self.pos] == '\n':  # setting indents or dedents
+            nrbs = 0
+            self.pos += 1
+            while self.pos < len(self.input) and self.input[self.pos] == ' ':
+                self.pos += 1
+                nrbs     += 1
+            if nrbs < self.indent[0]:
+                self.undents = [1 for a in self.indent if a > nrbs]
+                self.indent  = [a for a in self.indent if a <= nrbs]
+            elif nrbs > self.indent[0]:
+                self.nextindent = True
+                self.indent.insert(0,nrbs)
+            self.toktype = 'terminal'
+            self.curtok = '\n'
+            return '\n'
+        start = self.pos
+        if self.input[start] in ['(',')',',','[',']','{','}','~']:
+            res = self.input[start]
+            self.pos += 1
+            self.toktype = 'terminal'
+            self.curtok = res
+            return res
+        elif self.input[start] in ['+','-','*','/','%',':','=','@','#','!','&','?','<','>','|',';']:
+            while  self.pos < len(self.input) and self.isopchar(self.input[self.pos]) :
+                self.pos += 1
+            res = self.input[start:self.pos]
+            self.curtok = res
+            self.toktype = 'terminal'
+            return res
+        elif self.input[start].isdigit():
+            while  self.pos < len(self.input) and self.input[self.pos].isdigit():
+                self.pos += 1
+            res = self.input[start:self.pos]
+            self.curtok = res
+            self.toktype = 'num'
+            return res
+        elif self.input[start].isalpha() or self.input[start] == '_':
+            while  self.pos < len(self.input) and (self.input[self.pos].isalnum() or self.input[self.pos] == '_'):
+                self.pos += 1
+            res = self.input[start:self.pos]
+            self.curtok = res
+            if res in self.predefterms:
+                self.toktype = 'terminal'
+            else:
+                self.toktype = 'iden'
+            return res
+        else:
+            self.curtok = 'eof'
+            self.toktype = 'eof'
+            return 'eof'
+
+    def isblank(self,c):
+        return c == ' ' or c == '\t'
+
+    def isopchar(self,c):
+        return not (self.isblank(c) or c.isalnum() or c == '_' or c == '\n' or c  in ['(',')',',','[',']','{','}','~'])
+
+def _option(p,f):
+    try:
+        res = f(p)
+        return res
+    except ParseError:
+        return None
+
+def option(f):
+    return lambda p: _option(p,f)
+
+def _repeat(p,f):
+    res = []
+    try:
+        while True:
+            r = f(p)
+            res.append(r)
+    except ParseError:
+        return res
+
+def repeat(f):
+    return lambda p: _repeat(p,f)
+
+def _terminal(p,term):
+    if p.toktype == 'terminal' and p.curtok == term:
+        p.gettoken()
+        return term
+    else:
+        raise ParseError(term + ' expected ' + 'but found: ' + p.curtok)
+
+def terminal(t):
+    return lambda p: _terminal(p,t)
+
+def nextis(tok,type,t = None):
+    if type == tok.toktype and type != 'terminal' :
+        return True
+    elif type == tok.toktype and type == 'terminal' and t == tok.curtok:
+        return True
+    else:
+        return False
+
+def ident(p):
+    if p.toktype == 'iden':
+        res = p.curtok
+        p.gettoken()
+        return res
+    else:
+        raise ParseError('identifier expected')
+
+def number(p):
+    if p.toktype == 'num':
+        res = p.curtok
+        p.gettoken()
+        return res
+    else:
+        raise ParseError('number expected')
+
+def string(p):
+    if p.toktype == 'str':
+        res = p.curtok
+        p.gettoken()
+        return res
+    else:
+        raise ParseError('string expected')
+
+def indent(p):
+    if p.toktype == 'indent':
+        p.gettoken()
+        return 'indent'
+    else:
+        raise ParseError('indentation expected')
+
+def dedent(p):
+    if p.toktype == 'dedent':
+        p.gettoken()
+        return 'dedent'
+    else:
+        raise ParseError('dedentation expected')
+
+def _choice(p,p1,p2):
+    try:
+        res = p1(p)
+        return res
+    except ParseError as e1:
+        try:
+            res = p2(p)
+            return res
+        except ParseError as e2:
+            raise ParseError((e1,e2))
+
+def choice(p1,p2):
+    return lambda p: _choice(p,p1,p2)
+
+def _multichoice(p,ps):
+    if len(ps) > 0:
+        f = ps[0]
+        rs = ps[1:]
+    else:
+        raise ParseError('no match in multi choice')
+    try:
+        res = f(p)
+        return res
+    except ParseError:
+        return _multichoice(p,rs)
+
+def multichoice(ps):
+    return lambda p: _multichoice(p,ps)
+
+def _mseq(p,ps):
+    res = []
+    for f in ps:
+        r = f(p)
+        res.append(r)
+    return res
+
+def mseq(fs):
+    return lambda p: _mseq(p,fs)
+
+def _seq(p,f,s):
+    r1 = f(p)
+    r2 = s(p)
+    return (r1,r2)
+
+def seq(f,g):
+    return lambda p: _seq(p,f,g)
+
+class ParseError(Exception):
+    pass
+
+def rules(p):
+    r = rule(p)
+    rs = [ru for _,ru in repeat(seq(rulesep,rule))(p)]
+    return [r] + rs
+
+def rulesep(p):
+    terminal('\n')(p)
+    repeat(terminal('\n'))(p)
+    return '\n'
+
+def rule(p):
+    name = ident(p)
+    terminal('->')(p)
+    es = choiceseq(p)
+    return 'rule',name,es
+
+def choiceseq(p):
+    e = repitem(p)
+    es = [ex for _,ex in repeat(seq(terminal('|'),repitem))(p)]
+    if len(es) == 0:
+        return e
+    else:
+        return 'choice',[e] + es
+
+def repitem(p):
+    return 'seq',repeat(item)(p)
+
+def item(p):
+    r = multichoice([termtok,name,terminal('num'),terminal('newline'),terminal('indent'),terminal('dedent'),terminal('iden'),between('(',')',choiceseq)])(p)
+    m = option(multiplicity)(p)
+    if m == None:
+        return r
+    else:
+        return m,r
+        #return 'multi',r,m
+
+def termtok(p):
+    return 'term',string(p)
+
+def name(p):
+    return 'name',ident(p)
+
+def multiplicity(p):
+    return multichoice([terminal('*'),terminal('+'),terminal('?')])(p)
+
+def _between(p,a,b,f):
+    _,r,_ = mseq([terminal(a),f,terminal(b)])(p)
+    return r
+
+def between(a,b,f):
+    return lambda p: _between(p,a,b,f)
+
+def toks(a):
+    p = Parser(a)
+    #p.setDelim('<','>')
+    while (p.curtok != 'eof'):
+        print(p.curtok, p.toktype)
+        p.gettoken()
+
+def doParse(p,rulename,rs):
+    r = findRule(rulename,rs)
+    _,name,rhs = r
+    return (name,_execParse(p,rhs,rs))
+
+def _execParse(p,rhs,rs):
+    if rhs == 'num':
+        return [number(p)]
+    elif rhs == 'iden':
+        return [ident(p)]
+    elif rhs == 'newline':
+        return [terminal('\n')(p)]
+    elif rhs == 'indent':
+        return [indent(p)]
+    elif rhs == 'dedent':
+        return [dedent(p)]
+    elif rhs == 'newline':
+        return [terminal('\n')(p)]
+    t,ss = rhs
+    if t == 'seq':
+        return [execParse(s,rs)(p) for s in ss]
+    elif t == 'choice':
+        return multichoice([execParse(s,rs) for s in ss])(p)
+    elif t == 'term':
+        return [terminal(ss)(p)]
+    elif t == 'name':
+        r = findRule(ss,rs)
+        if r != None:
+            _,_,rhs = r
+            return ss,execParse(rhs,rs)(p)
+        else:
+            if p.curtok == ss:
+                r = ident(p)
+                return [r]
+            else:
+                raise ParseError(ss + ' expected')
+    elif t == '*':
+        res = repeat(execParse(ss,rs))(p)
+        return res
+    elif t == '+':
+        res = repeat(execParse(ss,rs))(p)
+        if len(res) < 1:
+            raise ParseError('At least on case expected in +')
+        return res
+    elif t == '?':
+        res = repeat(execParse(ss,rs))(p)
+        if len(res) > 1:
+            raise ParseError('Too many cases in option')
+        return res
+
+def execParse(rhs,rs):
+    return lambda p: _execParse(p,rhs,rs)
+
+def findRule(name,rules):
+    for r in rules:
+        _,n,_ = r
+        if name == n:
+            return r
+    return None
+
+def nameRule(r):
+    _,n,_ = r
+    return n
+
+def read(g):
+    with open(g,'r') as file:
+        gr = file.read()
+    return gr
+
+def parseWithGramFile(gram,e):
+    return parseWithGram(read(gram),e)
+
+def parseWithGram(gram,e):
+    try:
+        p = Parser(gram)
+        p.setPredefterms(['num','iden','newline','indent','dedent'])
+        gr = rules(p)
+        #print(gr)
+        startrule = gr[0]
+        _,n,_ = startrule
+        q = Parser(e)
+        res = doParse(q,n,gr)
+        return res
+    except ParseError as e:
+        print(e)
+        return None
+
+def flatten(topnode):
+
+    def flat(node,count):
+        if type(node) != tuple and type(node) != list:
+            count += 1
+            return [(count,node,[])],count
+        elif type(node) == list:
+            res = []
+            for n in node:
+                rs, count = flat(n,count)
+                res.extend(rs)
+            return res,count
+        elif type(node) == tuple:
+            e,ns = node
+            count += 1
+            mycount = count
+            rs,count = flat(ns,count)
+            return [(mycount,e,rs)],count
+
+    r,_ = flat(topnode,0)
+    return r
+
+def genASTFile(gramfile,exp):
+    return genAST(read(gramfile),exp)
+
+def genAST(gram,exp):
+    pt = parseWithGram(gram,exp)
+    r = flatten(pt)
+    #print(r)
+    ls = genLabels(r)
+    es = genEdges(r)
+    res = header
+    res += '\n'.join(ls + es)
+    res += '\n}'
+    return res
+
+def genLabels(ls):
+    if type(ls) == tuple:
+        k,l,ns = ls
+        if l == '\n':
+            l = 'newline'
+        res = [str(k) + '[label = "' + l + '"];']
+        res.extend(genLabels(ns))
+        return res
+    elif type(ls) == list:
+        res = []
+        for n in ls:
+            res.extend(genLabels(n))
+        return res
+    else:
+        return []
+
+
+def genEdges(ls):
+    if type(ls) == tuple:
+        k,l,ns = ls
+        res = []
+        for m,_,_ in ns:
+            res.append(str(k) + ' -> ' + str(m) + ';')
+        res.extend(genEdges(ns))
+        return res
+    elif type(ls) == list:
+        res = []
+        for n in ls:
+            res.extend(genEdges(n))
+        return res
+    else:
+        return []
+
+
+header = """digraph finite_state_machine {
+   rankdir=AST;
+   node [shape=none, fontsize=10, fontname="Courier", height=.1];
+   ranksep=.3;
+   edge [arrowsize=.4]
+   """
+
+def testp(f,a):
+    p = Parser(a)
+    p.setPredefterms(['num','iden','newline','indent','dedent'])
+    res = f(p)
+    return res
+
+def readgram(n):
+    grt = read(n)
+    gr  = testp(rules,grt)
+    for r in gr:
+        print(r)
+    return gr
+
+#ptest = 'e -> t ((\'+\' | \'->\') t)*\nt -> f ((\'*\' | \'/\') f)*\nf -> num | \'(\' e \')\''
+#nltest = 's -> iden num newline indent return num newline dedent'
+#ctest = read('ttt.gr')
+#ctest = 'ss -> stm+\nstm -> sstm \';\'\nsstm -> a | b\na -> return num\nb -> iden \'=\' num'
+
+#genAST(ptest,'12 + 13')
+#a = parseWithGram(nltest,'aap 23 \n return 44\n')
+#a = parseWithGram(ctest,'return 66;')
+
+#a = parseWithGramFile('python.gr','def f(a,b):\n a = 4\n return 6\n')
+
+#pyp = read('test.py')
+#a = parseWithGramFile('python.gr',pyp)
+#print(a)
+#a = genASTFile('python.gr',pyp)
+#print(a)
+
+`
+</script>
+
+<textarea id="yourcode" type="hidden" cols="40" rows="10" hidden>
+class Parser:
+
+    def __init__(self,t):
+        self.pos         = 0
+        self.indent      = [0]
+        self.undents     = []
+        self.nextindent  = False
+        self.input       = t
+        self.curtype     = 'none'
+        self.predefterms = []
+        self.begindelim  = '\''
+        self.enddelim    = '\''
+        self.curtok      = self.gettoken()
+
+    def setPredefterms(self,ts):
+        self.predefterms = ts
+        self.pos = 0
+        self.gettoken()
+
+    def setDelim(self,o,e):
+        self.begindelim = o
+        self.enddelim   = e
+
+    def gettoken(self):
+        if self.nextindent:
+            self.nextindent = False
+            self.curtok = 'indent'
+            self.toktype = 'indent'
+            return 'indent'
+        if len(self.undents) > 0:
+            self.undents.pop()
+            self.toktype = 'dedent'
+            self.curtok = 'dedent'
+            return 'dedent'
+        while self.pos < len(self.input) and self.input[self.pos] == ' ':
+            self.pos += 1
+        start = self.pos
+        if self.pos == len(self.input):
+            self.toktype = 'eof'
+            self.curtok = 'eof'
+            return 'eof'
+        elif self.input[start] == self.begindelim:
+            self.pos += 1
+            while  self.pos < len(self.input) and self.input[self.pos] != self.enddelim:
+                self.pos += 1
+            res = self.input[start+1:self.pos]
+            self.pos += 1
+            self.toktype = 'str'
+            self.curtok = res
+            return res
+        elif self.input[self.pos] == '\n':  # setting indents or dedents
+            nrbs = 0
+            self.pos += 1
+            while self.pos < len(self.input) and self.input[self.pos] == ' ':
+                self.pos += 1
+                nrbs     += 1
+            if nrbs < self.indent[0]:
+                self.undents = [1 for a in self.indent if a > nrbs]
+                self.indent  = [a for a in self.indent if a <= nrbs]
+            elif nrbs > self.indent[0]:
+                self.nextindent = True
+                self.indent.insert(0,nrbs)
+            self.toktype = 'terminal'
+            self.curtok = '\n'
+            return '\n'
+        start = self.pos
+        if self.input[start] in ['(',')',',','[',']','{','}','~']:
+            res = self.input[start]
+            self.pos += 1
+            self.toktype = 'terminal'
+            self.curtok = res
+            return res
+        elif self.input[start] in ['+','-','*','/','%',':','=','@','#','!','&','?','<','>','|',';']:
+            while  self.pos < len(self.input) and self.isopchar(self.input[self.pos]) :
+                self.pos += 1
+            res = self.input[start:self.pos]
+            self.curtok = res
+            self.toktype = 'terminal'
+            return res
+        elif self.input[start].isdigit():
+            while  self.pos < len(self.input) and self.input[self.pos].isdigit():
+                self.pos += 1
+            res = self.input[start:self.pos]
+            self.curtok = res
+            self.toktype = 'num'
+            return res
+        elif self.input[start].isalpha() or self.input[start] == '_':
+            while  self.pos < len(self.input) and (self.input[self.pos].isalnum() or self.input[self.pos] == '_'):
+                self.pos += 1
+            res = self.input[start:self.pos]
+            self.curtok = res
+            if res in self.predefterms:
+                self.toktype = 'terminal'
+            else:
+                self.toktype = 'iden'
+            return res
+        else:
+            self.curtok = 'eof'
+            self.toktype = 'eof'
+            return 'eof'
+
+    def isblank(self,c):
+        return c == ' ' or c == '\t'
+
+    def isopchar(self,c):
+        return not (self.isblank(c) or c.isalnum() or c == '_' or c == '\n' or c  in ['(',')',',','[',']','{','}','~'])
+
+def _option(p,f):
+    try:
+        res = f(p)
+        return res
+    except ParseError:
+        return None
+
+def option(f):
+    return lambda p: _option(p,f)
+
+def _repeat(p,f):
+    res = []
+    try:
+        while True:
+            r = f(p)
+            res.append(r)
+    except ParseError:
+        return res
+
+def repeat(f):
+    return lambda p: _repeat(p,f)
+
+def _terminal(p,term):
+    if p.toktype == 'terminal' and p.curtok == term:
+        p.gettoken()
+        return term
+    else:
+        raise ParseError(term + ' expected ' + 'but found: ' + p.curtok)
+
+def terminal(t):
+    return lambda p: _terminal(p,t)
+
+def nextis(tok,type,t = None):
+    if type == tok.toktype and type != 'terminal' :
+        return True
+    elif type == tok.toktype and type == 'terminal' and t == tok.curtok:
+        return True
+    else:
+        return False
+
+def ident(p):
+    if p.toktype == 'iden':
+        res = p.curtok
+        p.gettoken()
+        return res
+    else:
+        raise ParseError('identifier expected')
+
+def number(p):
+    if p.toktype == 'num':
+        res = p.curtok
+        p.gettoken()
+        return res
+    else:
+        raise ParseError('number expected')
+
+def string(p):
+    if p.toktype == 'str':
+        res = p.curtok
+        p.gettoken()
+        return res
+    else:
+        raise ParseError('string expected')
+
+def indent(p):
+    if p.toktype == 'indent':
+        p.gettoken()
+        return 'indent'
+    else:
+        raise ParseError('indentation expected')
+
+def dedent(p):
+    if p.toktype == 'dedent':
+        p.gettoken()
+        return 'dedent'
+    else:
+        raise ParseError('dedentation expected')
+
+def _choice(p,p1,p2):
+    try:
+        res = p1(p)
+        return res
+    except ParseError as e1:
+        try:
+            res = p2(p)
+            return res
+        except ParseError as e2:
+            raise ParseError((e1,e2))
+
+def choice(p1,p2):
+    return lambda p: _choice(p,p1,p2)
+
+def _multichoice(p,ps):
+    if len(ps) > 0:
+        f = ps[0]
+        rs = ps[1:]
+    else:
+        raise ParseError('no match in multi choice')
+    try:
+        res = f(p)
+        return res
+    except ParseError:
+        return _multichoice(p,rs)
+
+def multichoice(ps):
+    return lambda p: _multichoice(p,ps)
+
+def _mseq(p,ps):
+    res = []
+    for f in ps:
+        r = f(p)
+        res.append(r)
+    return res
+
+def mseq(fs):
+    return lambda p: _mseq(p,fs)
+
+def _seq(p,f,s):
+    r1 = f(p)
+    r2 = s(p)
+    return (r1,r2)
+
+def seq(f,g):
+    return lambda p: _seq(p,f,g)
+
+class ParseError(Exception):
+    pass
+
+def rules(p):
+    r = rule(p)
+    rs = [ru for _,ru in repeat(seq(rulesep,rule))(p)]
+    return [r] + rs
+
+def rulesep(p):
+    terminal('\n')(p)
+    repeat(terminal('\n'))(p)
+    return '\n'
+
+def rule(p):
+    name = ident(p)
+    terminal('->')(p)
+    es = choiceseq(p)
+    return 'rule',name,es
+
+def choiceseq(p):
+    e = repitem(p)
+    es = [ex for _,ex in repeat(seq(terminal('|'),repitem))(p)]
+    if len(es) == 0:
+        return e
+    else:
+        return 'choice',[e] + es
+
+def repitem(p):
+    return 'seq',repeat(item)(p)
+
+def item(p):
+    r = multichoice([termtok,name,terminal('num'),terminal('newline'),terminal('indent'),terminal('dedent'),terminal('iden'),between('(',')',choiceseq)])(p)
+    m = option(multiplicity)(p)
+    if m == None:
+        return r
+    else:
+        return m,r
+        #return 'multi',r,m
+
+def termtok(p):
+    return 'term',string(p)
+
+def name(p):
+    return 'name',ident(p)
+
+def multiplicity(p):
+    return multichoice([terminal('*'),terminal('+'),terminal('?')])(p)
+
+def _between(p,a,b,f):
+    _,r,_ = mseq([terminal(a),f,terminal(b)])(p)
+    return r
+
+def between(a,b,f):
+    return lambda p: _between(p,a,b,f)
+
+def toks(a):
+    p = Parser(a)
+    #p.setDelim('<','>')
+    while (p.curtok != 'eof'):
+        print(p.curtok, p.toktype)
+        p.gettoken()
+
+def doParse(p,rulename,rs):
+    r = findRule(rulename,rs)
+    _,name,rhs = r
+    return (name,_execParse(p,rhs,rs))
+
+def _execParse(p,rhs,rs):
+    if rhs == 'num':
+        return [number(p)]
+    elif rhs == 'iden':
+        return [ident(p)]
+    elif rhs == 'newline':
+        return [terminal('\n')(p)]
+    elif rhs == 'indent':
+        return [indent(p)]
+    elif rhs == 'dedent':
+        return [dedent(p)]
+    elif rhs == 'newline':
+        return [terminal('\n')(p)]
+    t,ss = rhs
+    if t == 'seq':
+        return [execParse(s,rs)(p) for s in ss]
+    elif t == 'choice':
+        return multichoice([execParse(s,rs) for s in ss])(p)
+    elif t == 'term':
+        return [terminal(ss)(p)]
+    elif t == 'name':
+        r = findRule(ss,rs)
+        if r != None:
+            _,_,rhs = r
+            return ss,execParse(rhs,rs)(p)
+        else:
+            if p.curtok == ss:
+                r = ident(p)
+                return [r]
+            else:
+                raise ParseError(ss + ' expected')
+    elif t == '*':
+        res = repeat(execParse(ss,rs))(p)
+        return res
+    elif t == '+':
+        res = repeat(execParse(ss,rs))(p)
+        if len(res) < 1:
+            raise ParseError('At least on case expected in +')
+        return res
+    elif t == '?':
+        res = repeat(execParse(ss,rs))(p)
+        if len(res) > 1:
+            raise ParseError('Too many cases in option')
+        return res
+
+def execParse(rhs,rs):
+    return lambda p: _execParse(p,rhs,rs)
+
+def findRule(name,rules):
+    for r in rules:
+        _,n,_ = r
+        if name == n:
+            return r
+    return None
+
+def nameRule(r):
+    _,n,_ = r
+    return n
+
+def read(g):
+    with open(g,'r') as file:
+        gr = file.read()
+    return gr
+
+def parseWithGramFile(gram,e):
+    return parseWithGram(read(gram),e)
+
+def parseWithGram(gram,e):
+    try:
+        p = Parser(gram)
+        p.setPredefterms(['num','iden','newline','indent','dedent'])
+        gr = rules(p)
+        #print(gr)
+        startrule = gr[0]
+        _,n,_ = startrule
+        q = Parser(e)
+        res = doParse(q,n,gr)
+        return res
+    except ParseError as e:
+        print(e)
+        return None
+
+def flatten(topnode):
+
+    def flat(node,count):
+        if type(node) != tuple and type(node) != list:
+            count += 1
+            return [(count,node,[])],count
+        elif type(node) == list:
+            res = []
+            for n in node:
+                rs, count = flat(n,count)
+                res.extend(rs)
+            return res,count
+        elif type(node) == tuple:
+            e,ns = node
+            count += 1
+            mycount = count
+            rs,count = flat(ns,count)
+            return [(mycount,e,rs)],count
+
+    r,_ = flat(topnode,0)
+    return r
+
+def genASTFile(gramfile,exp):
+    return genAST(read(gramfile),exp)
+
+def genAST(gram,exp):
+    pt = parseWithGram(gram,exp)
+    r = flatten(pt)
+    #print(r)
+    ls = genLabels(r)
+    es = genEdges(r)
+    res = header
+    res += '\n'.join(ls + es)
+    res += '\n}'
+    return res
+
+def genLabels(ls):
+    if type(ls) == tuple:
+        k,l,ns = ls
+        if l == '\n':
+            l = 'newline'
+        res = [str(k) + '[label = "' + l + '"];']
+        res.extend(genLabels(ns))
+        return res
+    elif type(ls) == list:
+        res = []
+        for n in ls:
+            res.extend(genLabels(n))
+        return res
+    else:
+        return []
+
+
+def genEdges(ls):
+    if type(ls) == tuple:
+        k,l,ns = ls
+        res = []
+        for m,_,_ in ns:
+            res.append(str(k) + ' -> ' + str(m) + ';')
+        res.extend(genEdges(ns))
+        return res
+    elif type(ls) == list:
+        res = []
+        for n in ls:
+            res.extend(genEdges(n))
+        return res
+    else:
+        return []
+
+
+header = """digraph finite_state_machine {
+   rankdir=AST;
+   node [shape=none, fontsize=10, fontname="Courier", height=.1];
+   ranksep=.3;
+   edge [arrowsize=.4]
+   """
+
+def testp(f,a):
+    p = Parser(a)
+    p.setPredefterms(['num','iden','newline','indent','dedent'])
+    res = f(p)
+    return res
+
+def readgram(n):
+    grt = read(n)
+    gr  = testp(rules,grt)
+    for r in gr:
+        print(r)
+    return gr
+
+#ptest = 'e -> t ((\'+\' | \'->\') t)*\nt -> f ((\'*\' | \'/\') f)*\nf -> num | \'(\' e \')\''
+#nltest = 's -> iden num newline indent return num newline dedent'
+#ctest = read('ttt.gr')
+#ctest = 'ss -> stm+\nstm -> sstm \';\'\nsstm -> a | b\na -> return num\nb -> iden \'=\' num'
+
+#genAST(ptest,'12 + 13')
+#a = parseWithGram(nltest,'aap 23 \n return 44\n')
+#a = parseWithGram(ctest,'return 66;')
+
+#a = parseWithGramFile('python.gr','def f(a,b):\n a = 4\n return 6\n')
+
+#pyp = read('test.py')
+#a = parseWithGramFile('python.gr',pyp)
+#print(a)
+#a = genASTFile('python.gr',pyp)
+#print(a)
+
+
+
+
+</textarea>
+</html>

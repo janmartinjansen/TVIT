@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Web Component</title>
+</head>
+<body>
+    <h1>Minimal Web Component</h1>
+    <increment-input></increment-input>
+
+    <script>
+        class IncrementInput extends HTMLElement {
+            constructor() {
+                super();
+
+                // Maak shadow DOM
+                this.attachShadow({ mode: 'open' });
+
+                // Voeg HTML-structuur toe
+                this.shadowRoot.innerHTML = `
+                <style>
+                    :host {
+                        display: block;
+                        font-family: Arial, sans-serif;
+                        margin: 10px 0;
+                    }
+                    input {
+                        margin-right: 10px;
+                    }
+                </style>
+                    <input type="number" id="input" placeholder="Voer een getal in">
+                    <button id="increment">Increment</button>
+                    <div id="output"></div>
+                `;
+
+                // Elementen binden
+                this.input = this.shadowRoot.getElementById('input');
+                this.button = this.shadowRoot.getElementById('increment');
+                this.output = this.shadowRoot.getElementById('output');
+            }
+
+            connectedCallback() {
+                // Voeg event listener toe
+                this.button.addEventListener('click', () => this.incrementValue());
+            }
+
+            incrementValue() {
+                const inputValue = parseFloat(this.input.value);
+                if (!isNaN(inputValue)) {
+                    this.output.textContent = `Resultaat: ${inputValue + 1}`;
+                } else {
+                    this.output.textContent = 'Voer een geldig getal in.';
+                }
+            }
+        }
+
+        // Registreer custom element
+        customElements.define('increment-input', IncrementInput);
+    </script>
+</body>
+</html>

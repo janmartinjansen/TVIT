@@ -1,0 +1,68 @@
+<svg width="270pt" height="124pt"
+ viewBox="0.00 0.00 270.00 124.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 120)">
+<title>finite_state_machine</title>
+<polygon fill="white" stroke="white" points="-4,5 -4,-120 267,-120 267,5 -4,5"/>
+<!-- start -->
+<g id="node1" class="node"><title>start</title>
+<ellipse fill="black" stroke="black" cx="2" cy="-24" rx="1.8" ry="1.8"/>
+</g>
+<!-- q1 -->
+<g id="node2" class="node"><title>q1</title>
+<ellipse fill="none" stroke="red" cx="63" cy="-24" rx="20.8887" ry="20.8887"/>
+<text text-anchor="middle" x="63" y="-19.8" font-family="Times,serif" font-size="14.00">q1</text>
+</g>
+<!-- start&#45;&gt;q1 -->
+<g id="edge2" class="edge"><title>start&#45;&gt;q1</title>
+<path fill="none" stroke="black" d="M4.02406,-24C7.56263,-24 19.7316,-24 32.0132,-24"/>
+<polygon fill="black" stroke="black" points="32.1692,-27.5001 42.1692,-24 32.1692,-20.5001 32.1692,-27.5001"/>
+</g>
+<!-- q1&#45;&gt;q1 -->
+<g id="edge4" class="edge"><title>q1&#45;&gt;q1</title>
+<path fill="none" stroke="black" d="M55.7637,-43.1612C54.6504,-53.069 57.0625,-62 63,-62 66.7109,-62 69.0448,-58.5113 70.0015,-53.4759"/>
+<polygon fill="black" stroke="black" points="73.5077,-53.2383 70.2363,-43.1612 66.5095,-53.0789 73.5077,-53.2383"/>
+<text text-anchor="middle" x="63" y="-66.2" font-family="Times,serif" font-size="14.00">b</text>
+</g>
+<!-- q2 -->
+<g id="node3" class="node"><title>q2</title>
+<ellipse fill="none" stroke="black" cx="149" cy="-24" rx="20.8887" ry="20.8887"/>
+<text text-anchor="middle" x="149" y="-19.8" font-family="Times,serif" font-size="14.00">q2</text>
+</g>
+<!-- q1&#45;&gt;q2 -->
+<g id="edge6" class="edge"><title>q1&#45;&gt;q2</title>
+<path fill="none" stroke="black" d="M83.9068,-24C94.0541,-24 106.607,-24 117.906,-24"/>
+<polygon fill="black" stroke="black" points="118.236,-27.5001 128.236,-24 118.236,-20.5001 118.236,-27.5001"/>
+<text text-anchor="middle" x="106" y="-28.2" font-family="Times,serif" font-size="14.00">a</text>
+</g>
+<!-- q2&#45;&gt;q1 -->
+<g id="edge10" class="edge"><title>q2&#45;&gt;q1</title>
+<path fill="none" stroke="black" d="M131.733,-12.7592C125.27,-8.93446 117.578,-5.13823 110,-3.2 102.644,-1.31861 94.9998,-3.09207 88.104,-6.26235"/>
+<polygon fill="black" stroke="black" points="86.2597,-3.28404 79.2621,-11.2392 89.6933,-9.38411 86.2597,-3.28404"/>
+<text text-anchor="middle" x="106" y="-7.2" font-family="Times,serif" font-size="14.00">b</text>
+</g>
+<!-- q3 -->
+<g id="node4" class="node"><title>q3</title>
+<ellipse fill="none" stroke="black" cx="237" cy="-24" rx="20.8568" ry="20.8568"/>
+<ellipse fill="none" stroke="black" cx="237" cy="-24" rx="24.8884" ry="24.8884"/>
+<text text-anchor="middle" x="237" y="-19.8" font-family="Times,serif" font-size="14.00">q3</text>
+</g>
+<!-- q2&#45;&gt;q3 -->
+<g id="edge8" class="edge"><title>q2&#45;&gt;q3</title>
+<path fill="none" stroke="black" d="M169.946,-24C179.497,-24 191.203,-24 202.093,-24"/>
+<polygon fill="black" stroke="black" points="202.187,-27.5001 212.187,-24 202.187,-20.5001 202.187,-27.5001"/>
+<text text-anchor="middle" x="191" y="-28.2" font-family="Times,serif" font-size="14.00">a</text>
+</g>
+<!-- q3&#45;&gt;q3 -->
+<g id="edge12" class="edge"><title>q3&#45;&gt;q3</title>
+<path fill="none" stroke="black" d="M232.714,-48.1697C232.472,-57.8635 233.9,-66 237,-66 238.889,-66 240.157,-62.9786 240.805,-58.4246"/>
+<polygon fill="black" stroke="black" points="244.314,-58.3227 241.286,-48.1697 237.321,-57.9946 244.314,-58.3227"/>
+<text text-anchor="middle" x="237" y="-70.2" font-family="Times,serif" font-size="14.00">a</text>
+</g>
+<!-- q3&#45;&gt;q3 -->
+<g id="edge14" class="edge"><title>q3&#45;&gt;q3</title>
+<path fill="none" stroke="black" d="M229.489,-47.4029C226.68,-65.521 229.184,-84 237,-84 243.351,-84 246.194,-71.801 245.531,-57.5082"/>
+<polygon fill="black" stroke="black" points="248.998,-57.0009 244.511,-47.4029 242.033,-57.7038 248.998,-57.0009"/>
+<text text-anchor="middle" x="237" y="-88.2" font-family="Times,serif" font-size="14.00">b</text>
+</g>
+</g>
+</svg>

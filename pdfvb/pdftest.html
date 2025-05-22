@@ -1,0 +1,114 @@
+        <!DOCTYPE html>
+        <html lang="nl">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>PDF Viewer met Navigatie</title>
+            <style>
+                body { font-family: sans-serif; }
+                #controls {
+                    width: 80%;
+                    margin: 10px auto;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                #controls button {
+                    margin: 5px;
+                    padding: 8px 15px;
+                    cursor: pointer;
+                }
+                #page-info {
+                    margin: 0 10px;
+                }
+                #pdfContainer {
+                    width: 80%;
+                    margin: 20px auto;
+                    border: 1px solid #ccc;
+                    overflow: auto;
+                }
+                #pdfCanvas {
+                    display: block;
+                    max-width: 100%;
+                    height: auto;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>PDF Viewer met Navigatie</h1>
+        
+            <div id="controls">
+                <button id="prev-page">Vorige</button>
+                <span id="page-info"><span id="current-page"></span> van <span id="total-pages"></span></span>
+                <button id="next-page">Volgende</button>
+            </div>
+        
+            <div id="pdfContainer">
+                <canvas id="pdfCanvas"></canvas>
+            </div>
+        
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+            <script>
+                // Initialisatie
+                const pdfjsLib = window['pdfjs-dist/build/pdf'];
+                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.js`;
+        
+                let pdfDoc = null;
+                let pageNum = 1;
+                const canvas = document.getElementById('pdfCanvas');
+                const ctx = canvas.getContext('2d');
+                const pageInfo = document.getElementById('page-info');
+                const currentPageSpan = document.getElementById('current-page');
+                const totalPagesSpan = document.getElementById('total-pages');
+                const prevButton = document.getElementById('prev-page');
+                const nextButton = document.getElementById('next-page');
+        
+                function renderPage(num) {
+                    pdfDoc.getPage(num).then(page => {
+                        // Verhoog de initiële schaal (bijv. 1.5)
+                        const scale = 1.5;
+                        const viewport = page.getViewport({ scale: scale });
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+
+                        const renderContext = {
+                            canvasContext: ctx,
+                            viewport: viewport
+                        };
+                        return page.render(renderContext).promise;
+                    }).then(() => {
+                        currentPageSpan.textContent = num;
+                    });
+                }
+        
+                function loadPdf(url) {
+                    pdfjsLib.getDocument(url).promise.then(pdf => {
+                        pdfDoc = pdf;
+                        totalPagesSpan.textContent = pdf.numPages;
+                        renderPage(pageNum);
+                    }).catch(error => {
+                        console.error('Fout bij het laden van de PDF:', error);
+                    });
+                }
+        
+                // Event listeners voor de navigatieknoppen
+                prevButton.addEventListener('click', () => {
+                    if (pageNum > 1) {
+                        pageNum--;
+                        renderPage(pageNum);
+                    }
+                });
+        
+                nextButton.addEventListener('click', () => {
+                    if (pageNum < pdfDoc.numPages) {
+                        pageNum++;
+                        renderPage(pageNum);
+                    }
+                });
+        
+                // Laad het PDF-document
+                const pdfUrl = 'TuringMachines.pdf'; // Vervang door het pad naar jouw PDF-bestand
+                loadPdf(pdfUrl);
+            </script>
+        </body>
+        </html>

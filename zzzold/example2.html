@@ -1,0 +1,65 @@
+<html>
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>State machine visualizer</title>
+  </head>
+<body>
+
+  <auto-input></auto-input>
+
+</body>
+
+<script>
+    class AutoInput extends HTMLElement {
+        constructor() {
+            super();
+
+            // Maak shadow DOM
+            this.attachShadow({ mode: 'open' });
+
+            // Voeg HTML-structuur toe
+            this.shadowRoot.innerHTML = `
+<textarea id="inputdata" rows="20" cols="80" width="100%" wrap="off">
+q1 b q1
+q1 a q2
+q2 a q3
+q2 b q1
+q3 a q3
+q3 b q3
+start q1
+end q3
+</textarea>
+<br>
+<button type="button"id="gen">Generate</button>
+<br>
+<input type="text" id="str">
+<button type="button"id="check">Check</button>
+<div id="result">Result of check</div>
+<br>
+<hr>
+<div id="picture">
+  The result will appear here.
+</div>
+`;
+
+        }
+        connectedCallback() {
+          var gen = this.shadowRoot.getElementById("gen");
+          gen.addEventListener('click',() => updatePict(this.shadowRoot));
+          var check = this.shadowRoot.getElementById("check");
+          check.addEventListener('click',() => checkString(this.shadowRoot));
+        }
+
+    }
+
+    // Registreer custom element
+    customElements.define('auto-input', AutoInput);
+</script>
+
+<!-- Defer loading of javascript by placing these tags at the tail end of the document -->
+<script language="javascript" type="text/javascript" src="./viz.js"></script>
+<script language="javascript" type="text/javascript" src="./automaat_new.js"></script>
+
+
+
+</html>

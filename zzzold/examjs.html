@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>State machine visualizer</title>
+</head>
+<body>
+</body>
+
+<script language="javascript" type="text/javascript" src="./viz.js"></script>
+<script language="javascript" type="text/javascript" src="./automaat.js"></script>
+
+<script>
+  // Functie om elementen aan te maken en toe te voegen aan de pagina
+  function createElements() {
+    // Maak de tekst "Enter your state machine below:"
+    const enterText = document.createElement('p');
+    enterText.textContent = "Enter your state machine below:";
+    document.body.appendChild(enterText);
+
+    // Maak het textarea element
+    const textarea = document.createElement('textarea');
+    textarea.id = 'inputdata';
+    textarea.rows = 20;
+    textarea.cols = 80;
+    textarea.wrap = 'off';
+    textarea.value =
+`q1 b q1
+q1 a q2
+q2 a q3
+q2 b q1
+q3 a q3
+q3 b q3
+start q1
+end q3`;
+    document.body.appendChild(textarea);
+
+    // Maak de "Generate" knop
+    const generateButton = document.createElement('button');
+    generateButton.textContent = 'Generate';
+    generateButton.onclick = updatePict; // Koppel de functie updatePict aan de knop
+    document.body.appendChild(document.createElement('br'));
+    document.body.appendChild(generateButton);
+
+    // Maak een line break
+    document.body.appendChild(document.createElement('br'));
+
+    // Maak het input veld voor de string
+    const stringInput = document.createElement('input');
+    stringInput.type = 'text';
+    stringInput.id = 'str';
+    document.body.appendChild(stringInput);
+
+    // Maak de "Check" knop
+    const checkButton = document.createElement('button');
+    checkButton.textContent = 'Check';
+    checkButton.onclick = checkString; // Koppel de functie checkString aan de knop
+    document.body.appendChild(checkButton);
+
+    // Maak de div voor het resultaat
+    const resultDiv = document.createElement('div');
+    resultDiv.id = 'result';
+    resultDiv.textContent = 'Result of check';
+    document.body.appendChild(resultDiv);
+
+    // Maak een line break
+    const br2 = document.createElement('br');
+    document.body.appendChild(br2);
+
+    // Maak een horizontale lijn
+    const hr = document.createElement('hr');
+    document.body.appendChild(hr);
+
+    // Maak de div voor de afbeelding
+    const pictureDiv = document.createElement('div');
+    pictureDiv.id = 'picture';
+    pictureDiv.textContent = 'The result will appear here.';
+    document.body.appendChild(pictureDiv);
+  }
+
+  // Roep de functie aan om de elementen te creëren
+  createElements();
+  
+</script>
+
+
+</html>

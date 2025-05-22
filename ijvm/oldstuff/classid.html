@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ID en Class Voorbeeld</title>
+<style>
+  .belangrijk {
+    font-weight: bold;
+    color: blue;
+  }
+  .klein {
+    font-size: 0.8em;
+    color: gray;
+  }
+</style>
+</head>
+<body>
+
+  <div id="hoofdTitel">Welkom op mijn pagina!</div>
+
+  <p class="belangrijk">Dit is een belangrijke paragraaf.</p>
+  <p class="klein">Dit is een minder belangrijke paragraaf.</p>
+  <p class="belangrijk klein">Dit is een belangrijke en kleine paragraaf.</p>
+
+  <button id="veranderTitelKnop">Verander de titel</button>
+
+  <script>
+    const titelElement = document.getElementById('hoofdTitel');
+    const belangrijkeElementen = document.getElementsByClassName('belangrijk');
+    const alleKleineElementen = document.querySelectorAll('.klein');
+    const knop = document.getElementById('veranderTitelKnop');
+
+    knop.addEventListener('click', () => {
+      titelElement.textContent = 'De titel is veranderd!';
+    });
+
+    for (let element of belangrijkeElementen) {
+      element.addEventListener('mouseover', () => {
+        element.style.backgroundColor = 'yellow';
+      });
+      element.addEventListener('mouseout', () => {
+        element.style.backgroundColor = '';
+      });
+    }
+
+    alleKleineElementen.forEach(element => {
+      element.style.border = '1px solid lightgray';
+    });
+  </script>
+
+</body>
+</html>
