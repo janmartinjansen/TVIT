@@ -1,0 +1,6 @@
+# mappen en bestanden die niet meedoen
+.DS_Store
+dynload/
+parsing/
+zzzold
+vb\ component

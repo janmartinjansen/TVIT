@@ -1,3 +1,0 @@
-# Grammatica's en Parsen
-
-Type in Code een grammatica en een voorbeeld input voor de ze grammatica gescheiden door een regel met ----
