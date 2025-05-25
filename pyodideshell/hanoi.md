@@ -6,6 +6,7 @@ te lossen. Net zoals **Fibonacci** bevat deze funtie een dubbele recursie waardo
 Het basis idee achter **Hanoi** is dat als je **n** schijven van **a** naar **b** moet verplaatsen: je eerst de bovenste **n-1** schijven van **a** naar **c** verplaatst (hiervoor vertrouw je erop dat recursie voor een kleiner probleem het correcte resultaat geeft); daarna verplaats je de onderste schijf van **a** naar **b**; als laatste verplaats je de **n-1** schijven van **c** 
 weer naar **b**. Let op: alleen de print(a,b) voert een verplaatsing uit! In de IJVM wordt print(a) en daarna print(b) uitgevoerd.
 
+Let op: ```hanoi(n,a,b,c)``` moet je lezen als: verplaats **n** schijven van **a** naar **b** met **c** als hulp!
 
 ```python
 def hanoi(n,a,b,c):
