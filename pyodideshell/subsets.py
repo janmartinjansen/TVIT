@@ -1,9 +1,9 @@
-def subsets(k,xs):
-  if k == len(xs):
+def subsets(xs):
+  if xs == []:
     return [[]]
   else:
-    h = xs[k]
-    ss = subsets(k+1,xs)
-    return ss + [[h] + s for s in ss]
+    h, *ts = xs
+    ss = subsets(ts)
+    return [[h] + s for s in ss] + ss
   
-print(subsets(0,[1,2,3,4]))
+print(subsets([1,2,3,4]))
