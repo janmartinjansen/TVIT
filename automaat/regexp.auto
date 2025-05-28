@@ -1,4 +1,12 @@
-(ab)+
-
-tape ababab
-tape abba
+ab|ca 
+tape ab
+------
+a(b|c)a
+tape aba
+------
+(a|b)*
+tape aabaa
+-----
+a[.b] 
+tape a
+tape a.b

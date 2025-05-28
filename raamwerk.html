@@ -89,6 +89,12 @@
             background-color: #f0f0f0;
             font-size: 0.9em;
         }
+
+        #opgave-buttons {
+            margin-left: auto;
+            display: flex;
+            gap: 5px;
+        }
     </style>
 </head>
 <body>
@@ -97,11 +103,13 @@
         </div>
         <div id="content">
             <div id="opgave" class="opgave-content">
-                <div class="tab-buttons">
-                  <button onclick="openTabBes()">Beschrijving</button>
-                  <button onclick="openTabCode()">Code</button>
+                <div class="tab-buttons" style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <button onclick="openTabBes()">Beschrijving</button>
+                    <button onclick="openTabCode()">Code</button>
                     <button onclick="openTabOutput()">Run</button>
-                    <button onclick="nextOpgave()" id="nextexample" hidden>Next</button>
+                  </div>
+                  <div id="opgave-buttons"></div>
                 </div>
                 <div id="opgave-beschrijving" class="tab-content tab active"></div>
                 <div id="opgave-code" class="tab-content tab">
@@ -150,7 +158,6 @@
             let tabs = document.querySelectorAll(`#opgave .tab`);
             tabs.forEach(tab => tab.classList.remove('active'));
             document.getElementById(`opgave-beschrijving`).classList.add('active');
-            document.getElementById(`nextexample`).style.display = 'none';
             output_active = false;
         }
 
@@ -159,7 +166,6 @@
             tabs.forEach(tab => tab.classList.remove('active'));
             document.getElementById(`opgave-code`).classList.add('active');
             editor.renderer.updateFull(true);
-            document.getElementById(`nextexample`).style.display = 'none';
             output_active = false;
         }
 
@@ -175,8 +181,8 @@
               saveToParams(current_model,saved_code);
             }
             setDataSplit(newcode);
-            if (multi_example) document.getElementById(`nextexample`).style.display = 'inline';
             output_active = true;
+            genOpgaveButtons();
         }
 
         function genSavedList() {
@@ -331,17 +337,43 @@
           };
 
         function setDataSplit(data) {
-          opgaven = data.split('----');
+          opgaven = data.split('-----');
           multi_example = opgaven.length > 1;
-          if (multi_example && output_active) document.getElementById(`nextexample`).style.display = 'inline';
-          else document.getElementById(`nextexample`).style.display = 'none';
+          // const nextBtn = document.getElementById("nextexample");
+          // if (multi_example && output_active && nextBtn) nextBtn.style.display = 'inline';
+          // else if (nextBtn) nextBtn.style.display = 'none';
           setData(opgaven[0]);
           current_opgave = 0;
+          genOpgaveButtons();
         }
 
         function nextOpgave() {
           current_opgave = (current_opgave + 1) % opgaven.length;
           setData(opgaven[current_opgave]);
+        }
+
+        function genOpgaveButtons() {
+          const buttonContainer = document.getElementById("opgave-buttons");
+          buttonContainer.innerHTML = ''; // leegmaken
+
+          if (multi_example && output_active) {
+            opgaven.forEach((_, index) => {
+              const btn = document.createElement("button");
+              btn.textContent = (index + 1).toString();
+              btn.style.marginRight = "5px";
+              btn.style.padding = "5px 10px";
+              btn.style.border = "none";
+              btn.style.borderRadius = "4px";
+              btn.style.backgroundColor = "#007acc";
+              btn.style.color = "white";
+              btn.style.cursor = "pointer";
+              btn.onclick = () => {
+                current_opgave = index;
+                setData(opgaven[index]);
+              };
+              buttonContainer.appendChild(btn);
+            });
+          }
         }
 
         getExamples();

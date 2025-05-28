@@ -17,7 +17,8 @@ tape ba
 ![Plaatje](./automaat/vb1.svg)
 
 Een regel bestaat uit ```state1 symbool state2```. Je moet een start state en minimaal 1 end state opgeven.
-Verder moet je een aantal voorbeeld tape (invoerstring) beschrijvingen geven (in dit geval zit er ook een lege invoerstring bij).
+Verder moet je een aantal voorbeeld tape (invoerstring) beschrijvingen geven (in dit voorbeeld zit er ook een lege invoerstring bij).
+Je kan meedere voorbeelden maken gescheiden door een regel met '-----' (zie Code).
 
 Onder de Run knop zie je een plaatje van de automaat en kan je de verschillende invoer stringen testen.
 Er is ook een step modus.
