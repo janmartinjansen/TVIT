@@ -127,7 +127,11 @@ function readFSM(inp) {
                 //alert('maybe RE: ' + ws[0])
                 //console.log(ws[0]); //alert('skip line: ' + ws[0].length)
                 var e = ws[0];
-                if (e.length >= 1 && isRE(e)) {
+                if (e.startsWith('tape')) {
+                  curtape = '';
+                  tapes.push(curtape);
+                }
+                else if (e.length >= 1 && isRE(e)) {
                   REfsm = readRE(e);
                   //alert([REfsm,isDFA(REfsm)])
                   isRegExp = true;
@@ -255,6 +259,7 @@ function appendLine() {
 }
 
 function isRE(es) {
+  if (es.startsWith('tape')) return false;
   for (e of es) {
     if (!'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()[]+*|-.'.includes(e)) return false;
   }

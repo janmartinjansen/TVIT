@@ -1,3 +1,7 @@
+intro.auto --- Eindige Automaten
 strmetaa.auto --- String met aa erin
 oefenen.auto --- Oefen opgaven
-opgave.auto --- Extra opgaven
+nd.auto --- Niet deterministische Automaten
+opgave.auto --- Meer opgaven
+regexp.auto --- Reguliere Expressies
+opgaveRE.auto --- Opgaven Reguliere Expressies

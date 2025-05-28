@@ -1,0 +1,18 @@
+1 a 1
+1 b 2
+2 b 2
+start 1
+end 1 2
+
+tape abbb
+tape bbbb
+tape
+tape ba
+----
+
+1 a 1
+1 b 2
+start 1
+end 2
+tape ab
+tape aaaaaab

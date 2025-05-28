@@ -2,13 +2,19 @@
 <html>
 <head>
     <title>Raamwerk TVIT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
     <style>
         body, html {
             height: 100%;
             margin: 0;
             background-color: #f4f6f8;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Roboto', sans-serif;
         }
 
         #container {
@@ -78,6 +84,11 @@
         #codeEditorOpgave {
             height: 300px;
         }
+        code {
+            font-family: 'Source Code Pro', monospace;
+            background-color: #f0f0f0;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -90,6 +101,7 @@
                   <button onclick="openTabBes()">Beschrijving</button>
                   <button onclick="openTabCode()">Code</button>
                     <button onclick="openTabOutput()">Run</button>
+                    <button onclick="nextOpgave()" id="nextexample" hidden>Next</button>
                 </div>
                 <div id="opgave-beschrijving" class="tab-content tab active"></div>
                 <div id="opgave-code" class="tab-content tab">
@@ -116,6 +128,10 @@
         var last_saved;
         var default_side;
         var current_model;
+        var multi_example = false;
+        var opgaven;
+        var current_opgave;
+        var output_active;
 
         editor.setOption("maxLines", 80);
         //editor.setTheme("ace/theme/monokai");
@@ -127,12 +143,15 @@
 
         function showContent() {
             openTabBes();
+            
         }
 
         function openTabBes() {
             let tabs = document.querySelectorAll(`#opgave .tab`);
             tabs.forEach(tab => tab.classList.remove('active'));
             document.getElementById(`opgave-beschrijving`).classList.add('active');
+            document.getElementById(`nextexample`).style.display = 'none';
+            output_active = false;
         }
 
         function openTabCode() {
@@ -140,6 +159,8 @@
             tabs.forEach(tab => tab.classList.remove('active'));
             document.getElementById(`opgave-code`).classList.add('active');
             editor.renderer.updateFull(true);
+            document.getElementById(`nextexample`).style.display = 'none';
+            output_active = false;
         }
 
         function openTabOutput() {
@@ -153,7 +174,9 @@
               genSavedList();
               saveToParams(current_model,saved_code);
             }
-            setData(newcode);
+            setDataSplit(newcode);
+            if (multi_example) document.getElementById(`nextexample`).style.display = 'inline';
+            output_active = true;
         }
 
         function genSavedList() {
@@ -204,7 +227,7 @@
           var data = saved_code.get(key);
           editor.setValue(data,-1);
           last_saved = data;
-          setData(data);
+          setDataSplit(data);
         }
 
         function delItem(key) {
@@ -271,7 +294,7 @@
               .then(data => {
                 editor.setValue(data,-1);
                 last_saved = data;
-                setData(data);
+                setDataSplit(data);
               })
               .catch(error => {
                 console.error('Er was een probleem bij het ophalen van het bestand:', error);
@@ -306,6 +329,20 @@
               console.error(`Fout bij het ophalen van resultaten voor "${name}":`, error);
             }
           };
+
+        function setDataSplit(data) {
+          opgaven = data.split('----');
+          multi_example = opgaven.length > 1;
+          if (multi_example && output_active) document.getElementById(`nextexample`).style.display = 'inline';
+          else document.getElementById(`nextexample`).style.display = 'none';
+          setData(opgaven[0]);
+          current_opgave = 0;
+        }
+
+        function nextOpgave() {
+          current_opgave = (current_opgave + 1) % opgaven.length;
+          setData(opgaven[current_opgave]);
+        }
 
         getExamples();
         showContent();
