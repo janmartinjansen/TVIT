@@ -19,6 +19,8 @@
           chainLoads(['skulpt.min','skulpt-stdlib','parser'],0,initParser); 
         else if (componentNaam == 'pyodideshell') 
           chainLoads(['pyodide','pyodideshell'],0,initPyodide); 
+        else if (componentNaam == 'autopython') 
+          chainLoads(['pyodide','autopython'],0,initPyodide); 
       }
       else {
         console.log('Geen component parameter gevonden in de URL.');
@@ -35,6 +37,8 @@
         //script.src = `${compnames[index]}/${compnames[index]}.js`;
         if (compnames[index] == 'pyodide') 
           script.src = pyodide;
+        else if (compnames[index] == 'autopython')
+          script.src = `pyodideshell/pyodideshell.js`;
         else 
           script.src = `${current_model}/${compnames[index]}.js`;
         var bdy = document.body;

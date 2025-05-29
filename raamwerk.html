@@ -139,7 +139,6 @@
         var multi_example = false;
         var opgaven;
         var current_opgave;
-        var output_active;
 
         editor.setOption("maxLines", 80);
         //editor.setTheme("ace/theme/monokai");
@@ -158,7 +157,8 @@
             let tabs = document.querySelectorAll(`#opgave .tab`);
             tabs.forEach(tab => tab.classList.remove('active'));
             document.getElementById(`opgave-beschrijving`).classList.add('active');
-            output_active = false;
+            document.getElementById("opgave-buttons").style.display = 'none';
+
         }
 
         function openTabCode() {
@@ -166,8 +166,8 @@
             tabs.forEach(tab => tab.classList.remove('active'));
             document.getElementById(`opgave-code`).classList.add('active');
             editor.renderer.updateFull(true);
-            output_active = false;
-        }
+            document.getElementById("opgave-buttons").style.display = 'none';
+      }
 
         function openTabOutput() {
             let tabs = document.querySelectorAll(`#opgave .tab`);
@@ -181,7 +181,7 @@
               saveToParams(current_model,saved_code);
             }
             setDataSplit(newcode);
-            output_active = true;
+            document.getElementById("opgave-buttons").style.display = 'flex';
             genOpgaveButtons();
         }
 
@@ -356,7 +356,7 @@
           const buttonContainer = document.getElementById("opgave-buttons");
           buttonContainer.innerHTML = ''; // leegmaken
 
-          if (multi_example && output_active) {
+          if (multi_example) {
             opgaven.forEach((_, index) => {
               const btn = document.createElement("button");
               btn.textContent = (index + 1).toString();
