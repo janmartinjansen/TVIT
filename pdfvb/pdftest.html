@@ -1,114 +1,276 @@
-        <!DOCTYPE html>
-        <html lang="nl">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>PDF Viewer met Navigatie</title>
-            <style>
-                body { font-family: sans-serif; }
-                #controls {
-                    width: 80%;
-                    margin: 10px auto;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
-                #controls button {
-                    margin: 5px;
-                    padding: 8px 15px;
-                    cursor: pointer;
-                }
-                #page-info {
-                    margin: 0 10px;
-                }
-                #pdfContainer {
-                    width: 80%;
-                    margin: 20px auto;
-                    border: 1px solid #ccc;
-                    overflow: auto;
-                }
-                #pdfCanvas {
-                    display: block;
-                    max-width: 100%;
-                    height: auto;
-                }
-            </style>
-        </head>
-        <body>
-            <h1>PDF Viewer met Navigatie</h1>
-        
-            <div id="controls">
-                <button id="prev-page">Vorige</button>
-                <span id="page-info"><span id="current-page"></span> van <span id="total-pages"></span></span>
-                <button id="next-page">Volgende</button>
-            </div>
-        
-            <div id="pdfContainer">
-                <canvas id="pdfCanvas"></canvas>
-            </div>
-        
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
-            <script>
-                // Initialisatie
-                const pdfjsLib = window['pdfjs-dist/build/pdf'];
-                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.js`;
-        
-                let pdfDoc = null;
-                let pageNum = 1;
-                const canvas = document.getElementById('pdfCanvas');
-                const ctx = canvas.getContext('2d');
-                const pageInfo = document.getElementById('page-info');
-                const currentPageSpan = document.getElementById('current-page');
-                const totalPagesSpan = document.getElementById('total-pages');
-                const prevButton = document.getElementById('prev-page');
-                const nextButton = document.getElementById('next-page');
-        
-                function renderPage(num) {
-                    pdfDoc.getPage(num).then(page => {
-                        // Verhoog de initiële schaal (bijv. 1.5)
-                        const scale = 1.5;
-                        const viewport = page.getViewport({ scale: scale });
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <title>Presentaties</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
 
-                        const renderContext = {
-                            canvasContext: ctx,
-                            viewport: viewport
-                        };
-                        return page.render(renderContext).promise;
-                    }).then(() => {
-                        currentPageSpan.textContent = num;
-                    });
-                }
-        
-                function loadPdf(url) {
-                    pdfjsLib.getDocument(url).promise.then(pdf => {
-                        pdfDoc = pdf;
-                        totalPagesSpan.textContent = pdf.numPages;
-                        renderPage(pageNum);
-                    }).catch(error => {
-                        console.error('Fout bij het laden van de PDF:', error);
-                    });
-                }
-        
-                // Event listeners voor de navigatieknoppen
-                prevButton.addEventListener('click', () => {
-                    if (pageNum > 1) {
-                        pageNum--;
-                        renderPage(pageNum);
+        h1 {
+            text-align: center;
+            background-color: #005a9e;
+            color: white;
+            padding: 10px 0;
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        #controls {
+            width: 100%;
+            max-width: 800px;
+            margin: 10px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #controls button {
+            background-color: #005a9e;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #week-buttons {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        #controls button:hover {
+            background-color: #003f6b;
+        }
+
+        #page-info {
+            font-weight: bold;
+        }
+
+        #pdfContainer {
+            width: 100%;
+            margin: 0 auto 40px auto;
+            border: 1px solid #ccc;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+        }       
+
+
+        #pdfCanvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        #sidebar {
+            width: 200px;
+            background-color: #e0e0e0; /* Aangepaste kleur */
+            padding: 8px; /* Aangepaste padding */
+            border-right: 1px solid #ddd; /* Rand toegevoegd */
+            font-size: 0.9em; /* Lettergrootte aangepast */
+            height: 100vh;
+            overflow-y: auto;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        #sidebar h2 {
+            font-size: 1.2rem;
+            margin-top: 0;
+        }
+
+        #sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        #sidebar ul li {
+            margin: 10px 0;
+        }
+
+        #sidebar ul li a {
+            text-decoration: none;
+            color: #007acc; /* Aangepaste linkkleur */
+            display: block;
+            padding: 4px 0;
+        }
+
+        #sidebar ul li a:hover {
+            text-decoration: underline;
+        }
+
+        #main-content {
+            margin-left: 220px;
+            padding: 20px;
+        }
+
+        .week-button.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .week-button {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <a href="../index.html" class="button">Home</a><br><br><br><br>
+        <h2>PDF-bestanden</h2>
+        <ul id="file-list"></ul>
+    </div>
+    <div id="main-content">
+    <div id="week-buttons">Week  
+        <button class="week-button" onclick="loadWeek('1', this)">1</button>
+        <button class="week-button" onclick="loadWeek('2', this)">2</button>
+        <button class="week-button" onclick="loadWeek('3', this)">3</button>
+        <button class="week-button" onclick="loadWeek('4', this)">4</button>
+        <button class="week-button" onclick="loadWeek('5', this)">5</button>
+        <button class="week-button" onclick="loadWeek('6', this)">6</button>
+    </div>
+    <h1 id="file-title">Presentaties</h1>
+
+    <div id="controls">
+        <button id="prev-page">Vorige</button>
+        <span id="page-info"><span id="current-page"></span> van <span id="total-pages"></span></span>
+        <button id="next-page">Volgende</button>
+        <button id="download-pdf">Download</button>
+    </div>
+
+    <div id="pdfContainer">
+        <canvas id="pdfCanvas"></canvas>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+    <script>
+        // Initialisatie
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.js`;
+
+        let pdfDoc = null;
+        let pageNum = 1;
+        let currentWeek = '1';
+        const canvas = document.getElementById('pdfCanvas');
+        const ctx = canvas.getContext('2d');
+        const pageInfo = document.getElementById('page-info');
+        const currentPageSpan = document.getElementById('current-page');
+        const totalPagesSpan = document.getElementById('total-pages');
+        const prevButton = document.getElementById('prev-page');
+        const nextButton = document.getElementById('next-page');
+
+        function renderPage(num) {
+            pdfDoc.getPage(num).then(page => {
+                // Automatisch schalen naar de breedte van de container
+                const containerWidth = document.getElementById('pdfContainer').clientWidth;
+                const unscaledViewport = page.getViewport({ scale: 1 });
+                const scale = containerWidth / unscaledViewport.width;
+                const viewport = page.getViewport({ scale: scale });
+                const outputScale = window.devicePixelRatio || 1;
+                canvas.width = viewport.width * outputScale;
+                canvas.height = viewport.height * outputScale;
+                canvas.style.width = `${viewport.width}px`;
+                canvas.style.height = `${viewport.height}px`;
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport,
+                    transform: outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null
+                };
+                return page.render(renderContext).promise;
+            }).then(() => {
+                currentPageSpan.textContent = num;
+            });
+        }
+
+        const downloadButton = document.getElementById('download-pdf');
+        let currentPdfUrl = '';
+
+        function loadPdf(url) {
+            currentPdfUrl = url;
+            document.getElementById('file-title').textContent = url.split('/').pop().replace(/\.pdf$/, '');
+            pdfjsLib.getDocument(url).promise.then(pdf => {
+                pdfDoc = pdf;
+                totalPagesSpan.textContent = pdf.numPages;
+                renderPage(pageNum);
+            }).catch(error => {
+                console.error('Fout bij het laden van de PDF:', error);
+            });
+        }
+
+        function loadWeek(week, button) {
+            document.querySelectorAll('.week-button').forEach(btn => btn.classList.remove('active'));
+            if (button) {
+                button.classList.add('active');
+            }
+            fetch(week + '/list.txt')
+                .then(response => response.text())
+                .then(text => {
+                    const files = text.trim().split('\n');
+                    const fileList = document.getElementById('file-list');
+                    fileList.innerHTML =  '';
+;
+                    currentWeek = week;
+                    if (files.length > 0) {
+                        pageNum = 1;
+                        loadPdf(`${week}/${files[0]}.pdf`);
                     }
-                });
-        
-                nextButton.addEventListener('click', () => {
-                    if (pageNum < pdfDoc.numPages) {
-                        pageNum++;
-                        renderPage(pageNum);
-                    }
-                });
-        
-                // Laad het PDF-document
-                const pdfUrl = 'TuringMachines.pdf'; // Vervang door het pad naar jouw PDF-bestand
-                loadPdf(pdfUrl);
-            </script>
-        </body>
-        </html>
+                    files.forEach(file => {
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.textContent = file;
+                        a.addEventListener('click', () => {
+                            pageNum = 1;
+                            loadPdf(`${week}/${file}.pdf`);
+                        });
+                        li.appendChild(a);
+                        fileList.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Fout bij het laden van list.txt uit week ' + week + ':', error));
+        }
+
+        // Event listeners voor de navigatieknoppen
+        prevButton.addEventListener('click', () => {
+            if (pageNum > 1) {
+                pageNum--;
+                renderPage(pageNum);
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (pageNum < pdfDoc.numPages) {
+                pageNum++;
+                renderPage(pageNum);
+            }
+        });
+
+         downloadButton.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.href = currentPdfUrl;
+            link.download = currentPdfUrl.split('/').pop();
+            link.click();
+        });
+               // Laad het PDF-document
+        // const pdfUrl = 'TuringMachines.pdf'; // Vervang door het pad naar jouw PDF-bestand
+        // loadPdf(pdfUrl);
+    </script>
+    </div>
+    <script>
+    window.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.week-button')[0].click();
+    });
+    </script>
+</body>
+</html>
