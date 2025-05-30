@@ -2,25 +2,65 @@
 <html>
   <head>
     <title>Tools voor TVIT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <style>
       body {
-        font-family: Arial, sans-serif;
+        font-family: 'Roboto', sans-serif;
         background-color: #f8f9fa;
         margin: 0;
-        padding: 2em;
+        padding: 0;
         color: #333;
       }
+
+      #sidebar {
+        width: 220px;
+        background-color: #e0e0e0;
+        padding: 16px;
+        border-right: 1px solid #ddd;
+        font-size: 0.9em;
+        height: 100vh;
+        overflow-y: auto;
+        position: fixed;
+        top: 0;
+        left: 0;
+      }
+
+      #sidebar h2 {
+        font-size: 1.2rem;
+        margin-top: 0;
+      }
+
+      #sidebar ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      #sidebar ul li {
+        margin: 10px 0;
+      }
+
+      #sidebar ul li a {
+        text-decoration: none;
+        color: #007acc;
+        display: block;
+        padding: 4px 0;
+      }
+
+      #sidebar ul li a:hover {
+        text-decoration: underline;
+      }
+
+      #main-content {
+        margin-left: 240px;
+        padding: 2em;
+      }
+
       h1 {
         color: #2c3e50;
         text-align: center;
         margin-bottom: 1em;
       }
-      ul {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 0;
-        list-style: none;
-      }
+
       li {
         background-color: #ffffff;
         margin: 0.5em 0;
@@ -29,34 +69,40 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         transition: background-color 0.3s ease;
       }
+
       li:hover {
         background-color: #f0f0f0;
       }
+
       a {
         text-decoration: none;
         color: #2980b9;
         font-weight: bold;
         display: block;
       }
+
       a:hover {
         color: #1a5f8a;
       }
     </style>
   </head>
 <body>
+  <div id="sidebar">
+    <h2>Tooling</h2>
+    <ul>
+      <li><a href="./raamwerk.html?component=automaat">Eindige Automaten en Reguliere Expressies</a></li>
+      <li><a href="./raamwerk.html?component=autopython">Eindige Automaten in Python</a></li>
+      <li><a href="./raamwerk.html?component=pdautomaat">Push Down Automaten</a></li>
+      <li><a href="./raamwerk.html?component=parser">Grammatica's en Parsers</a></li>
+      <li><a href="./raamwerk.html?component=turing">Turing Machine Simulator</a></li>
+      <li><a href="./raamwerk.html?component=ijvm">Virtuele Machine Simulator</a></li>
+      <li><a href="./raamwerk.html?component=pyodideshell">Python Voorbeelden</a></li>
+      <li><a href="./pdfvb/pdftest.html">Presentaties</a></li>
+    </ul>
+  </div>
 
-<h1>Voortgezette Informatica: Tooling en Presentaties</h1>
-
-<ul>
-  <li><a href="./raamwerk.html?component=automaat">Eindige Automaten en Reguliere Expressies</a></li>
-  <li><a href="./raamwerk.html?component=autopython">Eindige Automaten in Python</a></li>
-  <li><a href="./raamwerk.html?component=pdautomaat">Push Down Automaten</a></li>
-  <li><a href="./raamwerk.html?component=parser">Grammatica's en Parsers</a></li>
-  <li><a href="./raamwerk.html?component=turing">Turing Machine Simulator</a></li>
-  <li><a href="./raamwerk.html?component=ijvm">Virtuele Machine Simulator</a></li>
-  <li><a href="./raamwerk.html?component=pyodideshell">Python Voorbeelden</a></li>
-  <li><a href="./pdfvb/pdftest.html">Presentaties</a></li>
-</ul>
- 
+  <div id="main-content">
+    <h1>Voortgezette Informatica: Tooling en Presentaties</h1>
+  </div>
 </body>
 </html>
