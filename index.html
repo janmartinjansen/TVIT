@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Tools voor TVIT</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
     <style>
       body {
         font-family: 'Roboto', sans-serif;
@@ -10,86 +11,113 @@
         margin: 0;
         padding: 0;
         color: #333;
+        display: flex;
       }
 
-      #sidebar {
+      #sidebar, #right-sidebar {
         width: 220px;
         background-color: #e0e0e0;
         padding: 16px;
-        border-right: 1px solid #ddd;
         font-size: 0.9em;
         height: 100vh;
         overflow-y: auto;
         position: fixed;
         top: 0;
-        left: 0;
       }
 
-      #sidebar h2 {
+      #sidebar {
+        left: 0;
+        border-right: 1px solid #ddd;
+      }
+      
+      #right-sidebar {
+        right: 0;
+        border-left: 1px solid #ddd;
+      }
+
+      #sidebar h2, #right-sidebar h2 {
         font-size: 1.2rem;
         margin-top: 0;
       }
 
-      #sidebar ul {
+      #sidebar ul, #right-sidebar ul {
         list-style: none;
         padding: 0;
       }
 
-      #sidebar ul li {
+      #sidebar ul li, #right-sidebar ul li {
         margin: 10px 0;
       }
 
-      #sidebar ul li a {
+      #sidebar ul li a, #right-sidebar ul li a {
         text-decoration: none;
         color: #007acc;
         display: block;
         padding: 4px 0;
+        cursor: pointer;
       }
 
-      #sidebar ul li a:hover {
+      #sidebar ul li a:hover, #right-sidebar ul li a:hover {
         text-decoration: underline;
       }
 
       #main-content {
-        margin-left: 240px;
+        margin-left: 250px;
+        margin-right: 250px;
         padding: 2em;
+        flex-grow: 1;
       }
 
-      h1 {
+      /* Stijl voor de HOOFDTITEL van de pagina */
+      #main-content > h1 {
         color: #2c3e50;
         text-align: center;
+        margin-bottom: 1.5em;
+        background-color: #e0e0e0;
+        padding: 0.5em;
+        border-radius: 5px;
+        border-bottom: 3px solid #007acc;
+      }
+      
+      /* Stijl voor H1-koppen BINNEN de geladen Markdown-content */
+      #markdown-display h1 {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        text-align: left;
+        color: #2c3e50;
         margin-bottom: 1em;
+        font-size: 2em; /* Standaard H1-grootte */
       }
 
-      li {
-        background-color: #ffffff;
-        margin: 0.5em 0;
-        padding: 1em;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: background-color 0.3s ease;
+      #markdown-display {
+          border: 1px solid #007acc;
+          padding: 1.5em;
+          border-radius: 5px;
+          background-color: #ffffff;
       }
+      
+      #main-content code {
+            font-family: 'Source Code Pro', monospace;
+            background-color: #f0f0f0;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+       }
 
-      li:hover {
-        background-color: #f0f0f0;
-      }
-
-      a {
-        text-decoration: none;
-        color: #2980b9;
-        font-weight: bold;
-        display: block;
-      }
-
-      a:hover {
-        color: #1a5f8a;
-      }
+      #main-content pre code {
+            display: block;
+            padding: 1em;
+            border-radius: 5px;
+            overflow-x: auto;
+       }
     </style>
-  </head>
+</head>
 <body>
   <div id="sidebar">
     <h2>Tooling</h2>
     <ul>
+      <li><a href="./pdfvb/pdftest.html">Presentaties</a></li><br>
       <li><a href="./raamwerk.html?component=automaat">Eindige Automaten en Reguliere Expressies</a></li>
       <li><a href="./raamwerk.html?component=autopython">Eindige Automaten in Python</a></li>
       <li><a href="./raamwerk.html?component=pdautomaat">Push Down Automaten</a></li>
@@ -97,12 +125,80 @@
       <li><a href="./raamwerk.html?component=turing">Turing Machine Simulator</a></li>
       <li><a href="./raamwerk.html?component=ijvm">Virtuele Machine Simulator</a></li>
       <li><a href="./raamwerk.html?component=pyodideshell">Python Voorbeelden</a></li>
-      <li><a href="./pdfvb/pdftest.html">Presentaties</a></li>
     </ul>
   </div>
 
   <div id="main-content">
     <h1>Voortgezette Informatica: Tooling en Presentaties</h1>
+    <div id="markdown-display"></div>
   </div>
+
+  <div id="right-sidebar">
+      <h2>Mededelingen</h2>
+      <ul id="markdown-list"></ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@2.0.0/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    const markdownList = document.getElementById('markdown-list');
+    const markdownDisplay = document.getElementById('markdown-display');
+
+    // Functie om de inhoud van een Markdown-bestand te laden en weer te geven
+    function loadMarkdown(fileName) {
+        // We nemen aan dat de bestanden in een map 'mededelingen' staan
+        fetch(`mededelingen/${fileName}.md`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Netwerk response was niet ok voor ${fileName}`);
+                }
+                return response.text();
+            })
+            .then(markdown => {
+                // Converteer Markdown naar HTML met marked.js
+                markdownDisplay.innerHTML = marked(markdown);
+                
+                // Pas syntax highlighting toe op alle codeblokken
+                const codeBlocks = markdownDisplay.querySelectorAll('pre code');
+                codeBlocks.forEach(hljs.highlightElement);
+            })
+            .catch(error => {
+                console.error('Fout bij het laden van het markdown-bestand:', error);
+                markdownDisplay.innerHTML = `<p>Kon het bestand '${fileName}.md' niet laden.</p>`;
+            });
+    }
+
+    // Functie om de lijst met bestanden te laden en de sidebar te vullen
+    function populateSidebar() {
+        // We nemen aan dat de lijst in 'mededelingen/list.txt' staat
+        fetch('mededelingen/list.txt')
+            .then(response => response.text())
+            .then(text => {
+                const files = text.trim().split('\n').filter(file => file); // Filter lege regels
+                markdownList.innerHTML = ''; // Maak de lijst leeg
+
+                files.forEach(fileName => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.textContent = fileName.replace(/\.md$/, ''); // Toon naam zonder extensie
+                    a.onclick = () => loadMarkdown(fileName);
+                    li.appendChild(a);
+                    markdownList.appendChild(li);
+                });
+
+                // Laad het eerste bestand uit de lijst standaard
+                if (files.length > 0) {
+                    loadMarkdown(files[0]);
+                }
+            })
+            .catch(error => {
+                console.error('Fout bij het laden van list.txt:', error);
+                markdownList.innerHTML = '<li>Kon bestandslijst niet laden.</li>';
+            });
+    }
+
+    // Start het proces wanneer de pagina geladen is
+    document.addEventListener('DOMContentLoaded', populateSidebar);
+  </script>
 </body>
 </html>
