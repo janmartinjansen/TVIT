@@ -7,11 +7,32 @@
     <style>
       body {
         font-family: 'Roboto', sans-serif;
-        background-color: #f8f9fa;
+        background-color: #f8f9fa; /* Standaard achtergrondkleur voor fallback */
         margin: 0;
         padding: 0;
         color: #333;
-        display: flex;
+        
+        min-height: 100vh; /* Zorg dat de body minimaal de viewport vult */
+        position: relative; /* Nodig voor positioning van het pseudo-element */
+        z-index: 1; /* Zorgt ervoor dat de content boven de achtergrond ligt */
+
+        /* SVG Achtergrond Instellen */
+        background-image: url('background.svg'); /* Verander dit pad indien nodig */
+        background-repeat: repeat; /* Herhaal de afbeelding */
+        background-size: auto; /* Of 'cover', 'contain', of specifieke afmetingen */
+        background-position: center center; /* Centreer de afbeelding */
+      }
+
+      /* Pseudo-element voor de lichtblauwe, doorschijnende overlay */
+      body::before {
+          content: '';
+          position: fixed; 
+          top: 0;
+          left: 0;
+          width: 100vw; 
+          height: 100vh; 
+          background-color: rgba(220, 240, 255, 0.7); /* VERANDERD: Heel lichtblauw (220, 240, 255) met 70% opaciteit */
+          z-index: -1; /* Plaats achter de body content, maar boven de background-image */
       }
 
       #sidebar, #right-sidebar {
@@ -21,7 +42,7 @@
         font-size: 0.9em;
         height: 100vh;
         overflow-y: auto;
-        position: fixed;
+        position: fixed; 
         top: 0;
       }
 
@@ -62,10 +83,9 @@
       }
 
       #main-content {
-        margin-left: 250px;
-        margin-right: 250px;
+        margin-left: 250px; 
+        margin-right: 250px; 
         padding: 2em;
-        flex-grow: 1;
       }
 
       /* Stijl voor de HOOFDTITEL van de pagina */

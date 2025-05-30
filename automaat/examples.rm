@@ -1,5 +1,6 @@
 intro.auto --- Eindige Automaten
-strmetaa.auto --- String met aa erin
+strmetaa.auto --- String met minimaal aa
+2agt2b.auto --- Precies 2 a's en 2 of meer b's
 oefenen.auto --- Oefen opgaven
 nd.auto --- Niet deterministische Automaten
 opgave.auto --- Meer opgaven

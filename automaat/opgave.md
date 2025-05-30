@@ -13,12 +13,17 @@ Maak een deterministisch eindige automaat die strings herkent bestaande uit a's 
 # Niet deterministische Automaten
 Maak eerst een niet deterministische versie en maak deze deterministisch voor string van a's en b's waarvoor geldt:
 
-1. in de string komt de combinatie aba voor.
+1. in de string komt de combinatie aba voor
+2. in de string komt de combinatie aabaab voor
 
-Maak ook een reguliere expressie beschrijving voor bovenstaande opgaven en test deze uit. Vergelijk in de simulator de resulterende eindige automaat 
-met die je zelf bedacht had.
+Maak ook een reguliere expressie beschrijving voor bovenstaande opgaven en test deze uit. Vergelijk in de simulator de resulterende eindige automaat met die je zelf bedacht had.
 
 # Reguliere Expressies
+
+1. maak een reguliere expressie voor de automaten van opgave 2.3
+2. maak een reguliere expressie voor:
+
+![Plaatje](./automaat/opg25c.svg)
 
 Maak voor de volgende reguliere expressies (via een ND) een determinsitische eindige automaat:
 
