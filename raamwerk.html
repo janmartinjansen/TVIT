@@ -243,68 +243,68 @@
         }
 
         function getExamples() {
-          fetch(current_model + '/examples.rm')
-            .then(response => {
-              if (!response.ok) {
-                throw new Error('Netwerk response was niet ok');
-              }
-              return response.text(); // Haal de inhoud als tekst op
-            })
-            .then(data => {
-              genExamples(data);
-              var firstitem = examples[0];
-              var ns = nameAndLink(firstitem)
-              getDesAndCode(ns[0]);
-              getFromParams(current_model);
-            })
-            .catch(error => {
-              console.error('Er was een probleem bij het ophalen van het bestand:', error);
-            });
-          }
+            fetch(current_model + '/examples.rm')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Netwerk response was niet ok');
+                    }
+                    return response.text(); // Haal de inhoud als tekst op
+                })
+                .then(data => {
+                    genExamples(data);
+                    var firstitem = examples[0];
+                    var ns = nameAndLink(firstitem);
+                    getDesAndCode(ns[0]);
+                    getFromParams(current_model);
+                })
+                .catch(error => {
+                    console.error('Er was een probleem bij het ophalen van het bestand:', error);
+                });
+        }
 
-          function getDesAndCode(name) {
+        function getDesAndCode(name) {
             getOpgave(name.split('.')[0] + '.md');
             getCode(name);
-          }
+        }
 
-          function getOpgave(name) {
-          fetch(current_model + '/' + name)
-            .then(response => {
-              if (!response.ok) {
-                throw new Error('Netwerk response was niet ok');
-              }
-              return response.text(); // Haal de inhoud als tekst op
-            })
-            .then(data => {
-              const htmlOutputString = marked(data);
-              const tempElement = document.createElement('div');
-              tempElement.innerHTML = htmlOutputString;
-              const codeBlocks = tempElement.querySelectorAll('pre code');
-              codeBlocks.forEach(hljs.highlightElement);
-              document.getElementById('opgave-beschrijving').innerHTML = tempElement.innerHTML;
-            })
-            .catch(error => {
-              console.error('Er was een probleem bij het ophalen van het bestand:', error);
-            });
-          }
+        function getOpgave(name) {
+            fetch(current_model + '/' + name)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Netwerk response was niet ok');
+                    }
+                    return response.text(); // Haal de inhoud als tekst op
+                })
+                .then(data => {
+                    const htmlOutputString = marked(data);
+                    const tempElement = document.createElement('div');
+                    tempElement.innerHTML = htmlOutputString;
+                    const codeBlocks = tempElement.querySelectorAll('pre code');
+                    codeBlocks.forEach(hljs.highlightElement);
+                    document.getElementById('opgave-beschrijving').innerHTML = tempElement.innerHTML;
+                })
+                .catch(error => {
+                    console.error('Er was een probleem bij het ophalen van het bestand:', error);
+                });
+        }
 
-          function getCode(name) {
+        function getCode(name) {
             //console.log('fetching' + current_model + '/' + name)
             fetch(current_model + '/' + name)
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error('Netwerk response was niet ok');
-                }
-                return response.text(); // Haal de inhoud als tekst op
-              })
-              .then(data => {
-                editor.setValue(data,-1);
-                last_saved = data;
-                setDataSplit(data);
-              })
-              .catch(error => {
-                console.error('Er was een probleem bij het ophalen van het bestand:', error);
-              });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Netwerk response was niet ok');
+                    }
+                    return response.text(); // Haal de inhoud als tekst op
+                })
+                .then(data => {
+                    editor.setValue(data, -1);
+                    last_saved = data;
+                    setDataSplit(data);
+                })
+                .catch(error => {
+                    console.error('Er was een probleem bij het ophalen van het bestand:', error);
+                });
             }
 
             function genTimeStamp() {
