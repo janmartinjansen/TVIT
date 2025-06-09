@@ -11,24 +11,22 @@ Maak een deterministisch eindige automaat die strings herkent bestaande uit a's 
 7. de string begin met a gevolgd door alleen maar b's of begint met b gevolgd door alleen maar a's.
 
 # Niet deterministische Automaten
+
+1. Maak de volledige niet deterministische automaat deterministisch (opg2.1)
+
+![Plaatje](./automaat/opg21.svg)
+
 Maak eerst een niet deterministische versie en maak deze deterministisch voor string van a's en b's waarvoor geldt:
 
-1. in de string komt de combinatie aba voor
-2. in de string komt de combinatie aabaab voor
+2. in de string komt de combinatie aba voor
+3. in de string komt de combinatie aabaab voor
 
 Maak ook een reguliere expressie beschrijving voor bovenstaande opgaven en test deze uit. Vergelijk in de simulator de resulterende eindige automaat met die je zelf bedacht had.
 
-# Reguliere Expressies
+4. Maak de volledige niet deterministische automaat deterministisch (opg2.3 a en b) 
 
-1. maak een reguliere expressie voor de automaten van opgave 2.3
-2. maak een reguliere expressie voor:
+![Plaatje](./automaat/opg23a.svg)
 
-![Plaatje](./automaat/opg25c.svg)
+![Plaatje](./automaat/opg23b.svg)
 
-Maak voor de volgende reguliere expressies (via een ND) een determinsitische eindige automaat:
-
-```
-1. (a|b)*ab(aa)*
-2. (a|b)*(aa)*
-3. (a(aab)*)*|(bb)*
-```
+Opgaven Reguliere Expressies staan in het volgende blokje.

@@ -17,7 +17,11 @@ function setData(d) {
   data = d;
   fsmOK = false;
   [fsm,tape] = readFSM(d);
-  if (!fsmOK) return;
+  if (!fsmOK) { 
+    ndfadiv.innerHTML = '';
+    picdiv.innerHTML = fsm[0];
+    return;
+  }
   if (isDFA(fsm) && !isRegExp) {
     picdiv = dfadiv;
     ndfadiv.innerHTML = '';
