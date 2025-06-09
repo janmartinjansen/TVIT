@@ -23,10 +23,11 @@ Maak eerst een niet deterministische versie en maak deze deterministisch voor st
 
 Maak ook een reguliere expressie beschrijving voor bovenstaande opgaven en test deze uit. Vergelijk in de simulator de resulterende eindige automaat met die je zelf bedacht had.
 
-4. Maak de volledige niet deterministische automaat deterministisch (opg2.3 a en b) 
+4. Maak de volledige niet deterministische automaat deterministisch (opg2.3a) 
 
 ![Plaatje](./automaat/opg23a.svg)
 
+5. Maak de volledige niet deterministische automaat deterministisch (opg2.3b) 
+
 ![Plaatje](./automaat/opg23b.svg)
 
-Opgaven Reguliere Expressies staan in het volgende blokje.
