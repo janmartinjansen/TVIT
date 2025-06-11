@@ -63,20 +63,14 @@
 <polygon fill="black" stroke="black" points="189.979,-25.75 199.979,-22.2499 189.979,-18.75 189.979,-25.75"></polygon>
 <text text-anchor="middle" x="179" y="-26.4499" font-family="Times,serif" font-size="14.00">a</text>
 </g>
-<!-- 2&#45;&gt;3 -->
-<g id="edge16" class="edge"><title>2-&gt;3</title>
-<path fill="none" stroke="black" d="M154.851,-11.6804C160.986,-7.63955 168.503,-3.50957 176,-1.44988 182.427,0.31565 189.083,-0.890138 195.242,-3.4312"></path>
-<polygon fill="black" stroke="black" points="193.931,-6.69776 204.406,-8.28827 197.209,-0.512754 193.931,-6.69776"></polygon>
-<text text-anchor="middle" x="179" y="-5.44988" font-family="Times,serif" font-size="14.00">a</text>
-</g>
 <!-- 3&#45;&gt;3 -->
-<g id="edge18" class="edge"><title>3-&gt;3</title>
+<g id="edge16" class="edge"><title>3-&gt;3</title>
 <path fill="none" stroke="black" d="M218.124,-44.0565C217.755,-53.8124 219.047,-62.2499 222,-62.2499 223.846,-62.2499 225.043,-58.954 225.59,-54.1003"></path>
 <polygon fill="black" stroke="black" points="229.09,-54.152 225.876,-44.0565 222.093,-53.953 229.09,-54.152"></polygon>
 <text text-anchor="middle" x="222" y="-66.4499" font-family="Times,serif" font-size="14.00">a</text>
 </g>
 <!-- 3&#45;&gt;3 -->
-<g id="edge20" class="edge"><title>3-&gt;3</title>
+<g id="edge18" class="edge"><title>3-&gt;3</title>
 <path fill="none" stroke="black" d="M215.375,-43.3642C212.45,-61.3455 214.658,-80.2499 222,-80.2499 227.965,-80.2499 230.541,-67.77 229.729,-53.4453"></path>
 <polygon fill="black" stroke="black" points="233.193,-52.9237 228.625,-43.3642 226.234,-53.6858 233.193,-52.9237"></polygon>
 <text text-anchor="middle" x="222" y="-84.4499" font-family="Times,serif" font-size="14.00">b</text>

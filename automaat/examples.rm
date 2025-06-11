@@ -5,4 +5,5 @@ oefenen.auto --- Oefen opgaven
 nd.auto --- Niet deterministische Automaten
 opgave.auto --- Meer opgaven
 regexp.auto --- Reguliere Expressies
+binfloats.auto --- Gebruik Reguliere Expressies
 opgaveRE.auto --- Opgaven Reguliere Expressies

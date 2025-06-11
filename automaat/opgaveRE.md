@@ -1,7 +1,7 @@
 # Opgaven Reguliere Expressies
 
 1. maak een reguliere expressie voor de automaten van opgave 2.3 (zie blok Meer Opgaven)
-2. maak een reguliere expressie voor:
+2. maak een reguliere expressie voor (opg2.5c):
 
 ![Plaatje](./automaat/opg25c.svg)
 
