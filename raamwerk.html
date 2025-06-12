@@ -200,11 +200,14 @@
         function changeName(name) {
           let newname = prompt("Rename:", name);
           if (newname != null && newname != "") {
+            // Verwijder alle single quotes uit de nieuwe naam.
+            const sanitizedName = newname.replaceAll("'", "");
+
             let content = saved_code.get(name);
             saved_code.delete(name);
-            saved_code.set(newname,content);
+            saved_code.set(sanitizedName, content); // Gebruik de gesanitiseerde naam.
             genSavedList();
-            saveToParams(current_model,saved_code);
+            saveToParams(current_model, saved_code);
           }
         }
 
@@ -321,12 +324,22 @@
             }
           }
 
-          function getFromParams(name)  {
+          function getFromParams(name) {
             try {
               const resultString = localStorage.getItem(name);
               if (resultString) {
+                // Stap 1: Parse de JSON. 'results' is een array van [key, value] paren.
                 const results = JSON.parse(resultString);
-                saved_code = new Map(results);
+
+                // Stap 2: Transformeer de array om de keys op te schonen.
+                // Voor elk [key, value] paar, creëer een nieuw paar
+                // waar de key is gesanitiseerd en de value onveranderd is.
+                const sanitizedResults = results.map(([key, value]) => {
+                  return [key.replaceAll("'", ""), value];
+                });
+
+                // Stap 3: Creëer de Map met de opgeschoonde data.
+                saved_code = new Map(sanitizedResults);
                 genSavedList();
               } else {
                 console.log(`Geen resultaten gevonden voor "${name}".`);
@@ -335,7 +348,7 @@
               console.error(`Fout bij het ophalen van resultaten voor "${name}":`, error);
             }
           };
-
+          
         function setDataSplit(data) {
           opgaven = data.split('-----');
           multi_example = opgaven.length > 1;
