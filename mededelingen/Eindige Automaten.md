@@ -17,7 +17,7 @@ Hoe bewijs je dat formeel? In dit geval hebben we dat de ene kant op netjes geda
 we lieten zien hoe je voor een reguliere expressie een equivalente automaat kunt maken. 
 De andere kant op hebben we alleen maar aannemelijk gemaakt aan de hand van voorbeelden.
 Dat is dus geen formeel wiskundig bewijs.
-In de praktijk gebruik je reguliere expressies om invoerstringen te beschrijven en de bijbehorende eindige automaat om ze te kerkennen. 
+In de praktijk gebruik je reguliere expressies om invoerstringen te beschrijven en de bijbehorende eindige automaat om ze te herkennen. 
 
 
 

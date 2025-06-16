@@ -1,10 +1,10 @@
 # Tweede voorbeeld 
-Strings met net zoveel a's als b's.
+Strings met net zoveel a's als b's (dus ook door elkaar heen).
 
 Dit lijkt op het eerste gezicht ingewikkelder dan het vorige voorbeeld, maar dat is niet zo!
 
 a's en b's  kunnen nu in willekeurige volgorde voorkomen. We moeten ze tegen elkaar wegstrepen.
-Analyseer de automaar goed en probeer te begrijgen wat er gebeurt.
+Analyseer de automaat goed en probeer te begrijgen wat er gebeurt.
 
 ```
 start 1

@@ -20,7 +20,7 @@ Alle stack varianten zijn ook mogelijk met epsilon overgang, bv:
 ```
 Een stapel automaat accepteert een invoerstring als deze helemaal wordt herkend en de stack op het eind leeg is.
 
-Ons voorbeeld: een aantal a's gevolgt door net zoveel b's wordt nu: 
+Ons voorbeeld: een aantal a's gevolgd door net zoveel b's wordt nu: 
 
 ```
 0 a -/a 0
