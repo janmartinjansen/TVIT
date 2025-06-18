@@ -1,11 +1,3 @@
-# Probleem met ophalen uitwerkingen
-Het probleem met het niet meer kunnen ophalen van een opgeslagen uitwerking wordt waarschijnlijk veroorzaakt doordat er in de naam een ' voorkomt. 
-
-Ik heb een aanpassing gemaakt waarbij ' in namen automatisch verwijderd worden. In mijn testen werkt alles nu weer wel!
-
-Mocht er toch nog een probleem zijn dan hoor ik het graag!
-
-
 # Welkom bij Voortgezette Informatica
 Dit is de leeromgeving voor het vak Voortgezette Informatica.
 Hier komen de presentaties en andere documenten van dit vak te staan.

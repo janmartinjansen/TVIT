@@ -1,3 +1,4 @@
-# Grammatica's en Parsen
+# Rekenkundige Expressies's
 
-Hier de grammatica van rekenkundige epxpressie met een aantal voorbeelden.
+Kijk voor de uitleg bij de presentatie Grammatica's in week 2.
+

@@ -1,3 +1,5 @@
-expressie.gram --- rekenkundige expressies
-python.gram --- Python subset
+grammatica.gram --- Grammatica's
+expressie.gram --- Rekenkundige Expressies
+python.gram --- Python subset Grammatica
+opgaven.gram --- Opgaven Grammatica's
 op43.gram --- opgave 4.3

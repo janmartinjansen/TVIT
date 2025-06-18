@@ -1,6 +1,9 @@
 S -> d X | c S
 X -> a X | Y
-Y -> [b Y]
+Y -> (b Y)?
 
 ----
 c d a a
+
+----
+c d a a a a a b b b
