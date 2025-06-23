@@ -1,5 +1,5 @@
 # Eindige Automaten en Reguliere Expressies
-In de les praten we over eindige automatten in termen van herkenners van invoerstringen.
+In de les praten we over eindige automaten in termen van herkenners van invoerstringen.
 In de praktijk kunnen eindige automaten ook gebruikt worden voor het modelleren van veel systemen.
 Ieder systeem dat in (eindig) verschillende toestanden kan verkeren, waarbij de overgangen naar een
 andere toestand duidelijk zijn gedefinieerd (door een event, of iets dergelijks), kan gemodelleerd worden met een eindige automaat.
