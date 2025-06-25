@@ -1,0 +1,67 @@
+# dit is het voorbeeld
+# we noemen de representatie als data structuur van een functie f rep_f
+# seval is de self interpreter
+# er geldt dus: seval rep_f x1 .. xn = f x1 .. xn als f een functie is met n argumenten 
+# voor de eenvoud kijken we alleen naar functies f met maar 1 argument
+# dat kan omdat we altijd de mogelijk hebben de argumenten in een n-tuple te stoppen
+# dus er geldt: seval rep_f x = f x voor geldige argumenten  x
+
+# we definieren eerst een aantal hulp functies:
+
+True x y  = x
+False x y = y
+loop      = loop
+stop      = True
+
+# loop termineert duidelijk niet en stop duidelijk wel
+# het te kort door de bocht bewijs van halting
+# stel er bestaat een functie halt zodat halt f x = True  als f x stopt en False als f x niet termineert
+
+# definieer nu p (van paradox):
+
+p x = halt p x loop stop
+
+# wat geldt er dan voor: halt p x
+# als dit True oplevert dan termineert p x niet, volgens de definitie van p
+# als dit False oplevert dan termineert p x wel,  volgens de definitie van p
+# maar dit is beide in tegenspraak met de definitie van halt 
+
+# waarom is dit te kort door de bocht?
+# halt mag nooit op deze manier gedefinieerd worden: een functie kan immers niet in een andere functie kijken
+# een functie kan natuurlijk wel de representatie als datastructuur bekijken: rep_f
+# een correcte definitie van halt moeten we dus definieren in termen van rep_f, dus:
+
+# halt rep_f x = True als seval rep_f x termineert en = False als seval rep_f x niet termineert
+
+# wat wordt nu de definitie van p?
+# nu wordt het lastig: in de oude definitie van van staat: halt p x
+# dat moet halt rep_p x worden ivm bovenstaande
+# we kunnen wel van rep_f naar f mbv seval, maar het omgekeerde kan niet om dezelfde reden dat halt niet direct op f kan werken
+# we moeten een truc uithalen in de definitie van p
+# dit doen we als volgt, we definieren eerst een andere functie d:
+
+d f x = halt f x loop stop
+
+# let op de gelijkenis met p, we hebben alleen een extra argument f (denk aan de fixpoint definitie voor recursie, die gebruikt dezelfde truc!)
+# let op: f moet wel een representatie van een functie zijn, omdat halt nu werkt op representaties!
+# d is een nette functie (als we er vanuit gaan dat halt bestaat), die dus ook een representatie heeft: rep_d
+
+# bekijk nu: 
+
+d rep_d rep_d
+
+# dit is een zinnige uitdrukking omdat rep_d een representatie is, zoals hierboven vereist
+
+# vul dit in, in de definitie van d
+
+d rep_d rep_d = halt rep_d rep_d loop stop
+
+# er zijn nu twee opties: 
+
+# halt rep_d rep_d = True  => d rep_d rep_d = loop en termineert dus niet, maar dan had halt rep_d x dus False moeten opleveren
+# halt rep_d rep_d = False => d rep_d rep_d = stop en termineert dus wel,  maar dan had halt rep_d x dus True  moeten opleveren
+
+# in beide gevallen is er sprake van een tegenspraak => halt kan niet bestaan!
+
+
+
