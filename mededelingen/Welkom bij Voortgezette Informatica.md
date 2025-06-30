@@ -1,4 +1,7 @@
 # Welkom bij Voortgezette Informatica
+
+### les 1 juli is online (link volgt rond 8 uur dinsdagochtend)
+
 Dit is de leeromgeving voor het vak Voortgezette Informatica.
 Hier komen de presentaties en andere documenten van dit vak te staan.
 Tevens zijn er een aantal simulatoren waarmee de theorie geoefend kan worden.
