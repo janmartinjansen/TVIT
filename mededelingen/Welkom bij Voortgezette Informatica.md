@@ -1,7 +1,6 @@
 # Welkom bij Voortgezette Informatica
 
-### [Teams link 1 juli TVIT](https://teams.live.com/meet/9372754814665?p=SMXdPwzIHenQsqHN8z)
-
+https://teams.live.com/meet/9314806070587?p=fHLTDyJtxPB1lsBAx2
 Dit is de leeromgeving voor het vak Voortgezette Informatica.
 Hier komen de presentaties en andere documenten van dit vak te staan.
 Tevens zijn er een aantal simulatoren waarmee de theorie geoefend kan worden.
