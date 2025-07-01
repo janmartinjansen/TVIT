@@ -1,6 +1,6 @@
 # Welkom bij Voortgezette Informatica
 
-### les 1 juli is online (link volgt rond 8 uur dinsdagochtend)
+### [Teams link 1 juli TVIT](https://teams.live.com/meet/9372754814665?p=SMXdPwzIHenQsqHN8z)
 
 Dit is de leeromgeving voor het vak Voortgezette Informatica.
 Hier komen de presentaties en andere documenten van dit vak te staan.
