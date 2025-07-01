@@ -1,1 +1,28 @@
 # Oefening Palindroom
+0 1 x R 1
+1 _ _ R 8
+1 0 0 R 6
+1 1 1 R 6
+6 1 1 R 6
+6 0 0 R 6
+6 _ _ L 2
+2 1 _ L 3
+3 0 0 L 3
+3 1 1 L 3
+0 0 x R 4
+4 0 0 R 5
+4 1 1 R 5
+5 1 1 R 5
+5 0 0 R 5
+4 _ _ R 8
+5 _ _ L 7
+7 0 _ L 3
+3 x x R 0
+0 _ _ R 8
+accept 8
+start 0
+
+tape 00
+tape 010
+tape 0110
+tape 0101010
