@@ -1,0 +1,52 @@
+# Voorbeelden van ijvm code
+# Eenvoudige call
+
+    bipush 4
+    bipush 5
+    call 2 1 11
+    print
+    stop
+11  iload 0
+    iload 1
+    iadd
+    istore 2
+    iload 2
+    ireturn
+
+-----
+# Met extra optelling in print
+
+    bipush 6
+    bipush 4
+    bipush 5
+    call 2 1 11
+    iadd
+    print
+    stop
+11  iload 0 
+    iload 1
+    iadd
+    istore 2
+    iload 2
+    ireturn
+
+-----
+
+#  geneste calls
+
+    bipush 4
+    bipush 5
+    call 2 1 11
+    print
+    stop
+11  iload 0
+    call 1 0 22
+    iload 1
+    iadd
+    istore 2
+    iload 2
+    ireturn
+22  iload 0
+    bipush 1
+    iadd 
+    ireturn

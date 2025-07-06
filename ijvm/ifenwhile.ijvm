@@ -1,0 +1,38 @@
+# if en while voorbeelden
+
+    bipush 3
+    bipush 8
+    isub
+    call 1 0 11
+    print
+    stop
+11  iload 0
+    iflt 22
+    iload 0
+    ireturn
+22  bipush 0
+    iload 0
+    isub
+    ireturn
+
+-----
+
+    bipush 10
+    call 1 1 11
+    print
+    stop
+11  bipush 0
+    istore 1
+22  iload 0
+    ifeq 33
+    iload 1
+    iload 0
+    iadd
+    istore 1
+    iload 0
+    bipush 1
+    isub
+    istore 0
+    goto 22
+33  iload 1
+    ireturn

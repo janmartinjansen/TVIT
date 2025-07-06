@@ -1,5 +1,8 @@
 intro.ijvm --- Instructie overzicht
 simpel.ijvm --- rekenen
+voorbeelden.ijvm --- Voorbeelden
+ifenwhile.ijvm --- if en while
+mem.ijvm --- Heap en new
 kwadraat.ijvm 
 somloop.ijvm --- som 1..n
 somrec.ijvm --- som 1..n recursief

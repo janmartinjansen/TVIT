@@ -1,8 +1,5 @@
 # Welkom bij Voortgezette Informatica
 
-Online les 2 juli
-### Deel 1: https://teams.live.com/meet/9338506698884?p=PJbTiXJrnWjSazdv3d
-### Deel 2: https://teams.live.com/meet/9346974414854?p=egh1WNE7w7K1lpjH6z
 
 Dit is de leeromgeving voor het vak Voortgezette Informatica.
 Hier komen de presentaties en andere documenten van dit vak te staan.

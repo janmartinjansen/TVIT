@@ -4,3 +4,4 @@ Schema lessen
 Eindige Automaten
 Push Down Automaten
 Turing Machines
+Onbeslisbaarheid
