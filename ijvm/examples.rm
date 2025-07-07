@@ -1,13 +1,13 @@
 intro.ijvm --- Instructie overzicht
-simpel.ijvm --- rekenen
-voorbeelden.ijvm --- Voorbeelden
-ifenwhile.ijvm --- if en while
-mem.ijvm --- Heap en new
-kwadraat.ijvm 
+simpel.ijvm --- Rekenen
+voorbeelden.ijvm --- Eenvoudige voorbeelden
+ifenwhile.ijvm --- If en while
+mem.ijvm --- Arrays
+kwadraat.ijvm --- Kwadraat functie
 somloop.ijvm --- som 1..n
 somrec.ijvm --- som 1..n recursief
-fibonacci.ijvm
-ggd.ijvm --- grootste gemene deler
-hanoi.ijvm --- torens van Hanoi
-selsort.ijvm --- selection sort
-opgaven.ijvm 
+fibonacci.ijvm --- Fibonacci functie
+ggd.ijvm --- Grootste gemene deler
+hanoi.ijvm --- Torens van Hanoi
+selsort.ijvm --- Selection sort
+opgaven.ijvm --- Opgaven

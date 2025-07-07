@@ -1,0 +1,17 @@
+# voorbeeld mem
+
+bipush 3
+new
+bipush 5
+bipush 1
+iload 0
+iastore
+bipush 1
+iload 0
+iaload
+bipush 3
+iadd
+bipush 2
+iload 0
+iastore
+stop

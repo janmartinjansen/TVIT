@@ -3,6 +3,9 @@
 If en While zijn voorbeelden van jump (sprong) instructies: deze wijzigen de pc.
 Let op: in ifeq, iflt, etc spring je als er aan de conditie voldaan is (de afhandeling van if en else staan daardoor andersom)!
 
+De Ifs lijken wat beperkt met alleen een test op kleiner dan 0 of gelijk aan 0. Maar ```a < b``` is equivalent met ```a - b < 0```, 
+en ```a == b``` is equivalent met ```a - b == 0```, etc.
+
 ### Eenvoudig voorbeeld If
 Net zoals voor call gebruiken we labels om aan te geven waar we naartoe springen.
 Let op: bipush -7 werkt niet! Als we een negatief getal willen invoeren doen we dat door 0 - getal te berekenen.
