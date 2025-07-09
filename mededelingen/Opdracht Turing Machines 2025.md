@@ -22,4 +22,11 @@ De Turing machine moet ervoor zorgen dat het getal binair met 1 wordt opgehoogd:
 1000
 ```
 
-Bonus: de eis van meest linke bit gelijk aan 0 vervalt. Zorg ervoor dat het getal opschuift met een 1 ervoor indien dit nodig is!
+## Deel 2
+De invoer bestaat uit een aantal enen, een scheidingsteken - en voldoende nullen (bv 4).
+Verhoog de rechterkant net zo vaak met 1 als er enen voor de - staan (tel het aantal enen):
+
+```
+111-0000   wordt xxx-0011
+11111-0000 wordt xxxxx-0101
+```
