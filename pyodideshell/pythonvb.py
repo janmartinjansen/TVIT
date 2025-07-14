@@ -1,42 +1,48 @@
-import math
-
-def isPrime(n):
-    wn = math.sqrt(n)
-    wn = math.trunc(wn)
-    for k in range(2,wn+1):
-        if n % k == 0:
-            return False
-    return True
-
-def goldbach_bounded(b):
-    # every even number is the sum of 2 primes
-    # program
-    n = 4
-    while n < b:
-        if not isSum2Primes(n):
-            return False
-        n += 2
-    return True
-
-def goldbach():
-    # every even number is the sum of 2 primes
-    # program
-    n = 4
-    while True:
-        if not isSum2Primes(n):
-            return False
-        n += 2
-    return True
-
-def isSum2Primes(n):
-    for k in range(2,n//2+1):
-        if isPrime(k) and isPrime(n-k):
+def find(x,xs):
+    for a in xs:
+        if x == a:
             return True
     return False
-print(goldbach_bounded(10000))
 
-def som(n):
-  if n == 0: 
-    return 0;
-  else:
-    return n + som(n-1)
+def findW(x,xs):
+    i = 0
+    while i < len(xs):
+        if xs[i] == x:
+            return True
+        else:
+            i = i+1
+    return False
+
+def findR(x,xs):
+    if len(xs) == 0:
+        return False
+    else:
+        a,*rs = xs
+        if x == a:
+            return True
+        else:
+            return findR(x,rs)
+        
+def index(x,xs):
+    for i in range(len(xs)):
+        if x == xs[i]:
+            return i
+    return -1
+
+def indexR(i,x,xs):
+    if len(xs) == 0:
+        return -1
+    else:
+        a,*rs = xs
+        if x == a:
+            return i
+        else:
+            return indexR(i+1,x,rs)
+ 
+
+
+a = [1,2,3,4,5,6,7]
+print(find(3,a))
+print(findW(3,a))
+print(findR(3,a))
+print(indexR(0,5,a))

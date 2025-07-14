@@ -1,3 +1,3 @@
-# Kleinste element in een lsit
+# Kleinste element in een lijst
 
-Met loop en recursief
+Iteratieve en recursieve functie om het kleinste element in een lijst te vinden

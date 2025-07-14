@@ -1,5 +1,6 @@
 collatz.py --- Collatz vermoeden
-hanoi.py --- torens van Hanoi
-subsets.py --- deelverzamelingen
-fac.py --- faculteit: recursief en iteratief
-pythonvb.py --- wat Python functies
+hanoi.py --- Torens van Hanoi
+subsets.py --- Deelverzamelingen
+fac.py --- Faculteit: recursief en iteratief
+smallest.py --- Meer recursie: kleinste element van lijst
+pythonvb.py --- Opgaven met uitwerkingen
