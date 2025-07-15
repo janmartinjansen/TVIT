@@ -13,6 +13,14 @@ def findW(x,xs):
             i = i+1
     return False
 
+def findWR(i,x,xs):
+    if i == len(xs):
+        return False
+    elif x == xs[i]:
+        return True
+    else:
+        return findWR(i+1,x,xs)
+    
 def findR(x,xs):
     if len(xs) == 0:
         return False
@@ -44,5 +52,6 @@ def indexR(i,x,xs):
 a = [1,2,3,4,5,6,7]
 print(find(3,a))
 print(findW(3,a))
+print(findWR(0,3,a))
 print(findR(3,a))
 print(indexR(0,5,a))
