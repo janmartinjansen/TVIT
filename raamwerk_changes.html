@@ -1,0 +1,68 @@
+diff --git a/raamwerk.html b/raamwerk.html
+index 59dbac1..1292d18 100644
+--- a/raamwerk.html
++++ b/raamwerk.html
+@@ -193,6 +193,7 @@
+               <span style="cursor:pointer; color:blue; font-size: 0.8em;" title="Hernoem" onclick="changeName('${k}')">&#x270F;&#xFE0F;</span>
+               <a href="#" onclick="getSaved('${k}')">${k}</a>
+            </div>` + slist;
++//        <span style="cursor:pointer; color:blue; font-size: 0.8em;" title="Opslaan" onclick="submitItem('${k}')">&#x1F4BE;</span>
+           slist = `<h2>Opgeslagen</h2>${slist}`
+           document.getElementById('sidebar').innerHTML = default_side + slist;
+         }
+@@ -324,6 +325,55 @@
+             }
+           }
+ 
++          function submitAll(name, map)  {
++              try {
++                const resultString = JSON.stringify([name,Array.from(map.entries())]);
++                localStorage.setItem(name, resultString);
++              } catch (error) {
++                  console.error(`Fout bij het opslaan van resultaten voor "${name}":`, error);
++            }
++          }
++
++          async function sendToDB(opdrachtData) {
++              const currentUser = auth.currentUser;
++  
++              if (!currentUser) {
++                alert("Je moet ingelogd zijn om iets in te leveren.");
++                return;
++              }
++
++              try {
++                // Haal het ID-token op. Dit is je bewijs van authenticatie.
++                const idToken = await currentUser.getIdToken();
++                
++                // De URL van je Cloud Function (uit het 'Trigger' tabblad)
++                const functionUrl = "https://handle-submission-829713718534.europe-west4.run.app";
++
++                console.log("Versturen naar Cloud Function...");
++                
++                const response = await fetch(functionUrl, {
++                  method: 'POST',
++                  headers: {
++                    'Content-Type': 'application/json',
++                    'Authorization': `Bearer ${idToken}` // STUUR HET TOKEN MEE!
++                  },
++                  body: JSON.stringify({ opdracht: opdrachtData })
++                });
++
++                if (!response.ok) {
++                  throw new Error(`Serverfout: ${response.statusText}`);
++                }
++
++                const resultText = await response.text();
++                alert(`Reactie van de server: ${resultText}`);
++                opdrachtText.value = ''; // Maak het veld leeg na succes
++
++              } catch (error) {
++                console.error("Fout bij het versturen:", error);
++                alert(`Er is iets misgegaan: ${error.message}`);
++              }
++          }
++
+           function getFromParams(name) {
+             try {
+               const resultString = localStorage.getItem(name);

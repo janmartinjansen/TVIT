@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+  <h3>Studenten Inleverpunt</h3>
+  <textarea id="myText" rows="10" cols="50" placeholder="Typ hier je werk..."></textarea>
+  <br><br>
+  <button onclick="saveData()">Opslaan naar Drive</button>
+
+  <p id="status"></p>
+
+  <script>
+    // PLAK HIER je gekopieerde Web App URL
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw_6milGV7uvWTR0-kCD6xrERDdYrJtzTucrkSF9I75-fuE9ktfJZxhPhz1lL840iHW/exec';
+
+    async function saveData() {
+      const text = document.getElementById('myText').value;
+      const statusElement = document.getElementById('status');
+      
+      statusElement.innerText = "Bezig met opslaan...";
+
+      try {
+        const response = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Nodig voor Apps Script om CORS issues te vermijden bij simpele POSTs
+          body: JSON.stringify({ text: text })
+        });
+
+        // Let op: 'no-cors' geeft een opaque response, 
+        // dus we kunnen het succesbericht niet direct uitlezen, 
+        // maar de file wordt wel aangemaakt in Drive.
+        statusElement.innerText = "Bestand verzonden! Controleer je Drive.";
+      } catch (error) {
+        statusElement.innerText = "Fout: " + error;
+      }
+    }
+  </script>
+
+</body>
+</html>

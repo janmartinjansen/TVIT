@@ -194,7 +194,9 @@
         fetch('mededelingen/list.txt')
             .then(response => response.text())
             .then(text => {
-                const files = text.trim().split('\n').filter(file => file); // Filter lege regels
+                const files = text.split('\n')
+                                  .map(file => file.trim())
+                                  .filter(file => file && !file.startsWith('--')); // Filter lege regels en comments die beginnen met --
                 markdownList.innerHTML = ''; // Maak de lijst leeg
 
                 files.forEach(fileName => {
