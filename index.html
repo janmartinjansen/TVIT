@@ -135,6 +135,11 @@
 </head>
 <body>
   <div id="sidebar">
+    <div id="name-container" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ccc;">
+      <span style="font-weight: bold; display: block; margin-bottom: 4px;">Studentnaam:</span>
+      <span id="name-display" style="color: #555;">Niet ingesteld</span>
+      <a href="#" id="name-action" style="font-size: 0.85em; color: #007acc; text-decoration: none; display: block; margin-top: 4px;">[Instellen]</a>
+    </div>
     <h2>Tooling</h2>
     <ul>
       <li><a href="./pdfvb/pdftest.html">Presentaties</a></li><br>
@@ -219,8 +224,40 @@
             });
     }
 
+    // Functie om de naamweergave bij te werken
+    function updateNameDisplay() {
+        const storedName = localStorage.getItem('student_name');
+        const nameDisplay = document.getElementById('name-display');
+        const nameAction = document.getElementById('name-action');
+        if (storedName && storedName.trim() !== '') {
+            nameDisplay.textContent = storedName;
+            nameAction.textContent = '[Wijzigen]';
+        } else {
+            nameDisplay.textContent = 'Niet ingesteld';
+            nameAction.textContent = '[Instellen]';
+        }
+    }
+
+    // Initialiseer naam-actie knop click handler
+    function initNameHandler() {
+        const nameAction = document.getElementById('name-action');
+        nameAction.onclick = (e) => {
+            e.preventDefault();
+            const storedName = localStorage.getItem('student_name') || '';
+            const inputName = prompt("Voer je naam in (optioneel):", storedName);
+            if (inputName !== null) {
+                localStorage.setItem('student_name', inputName.trim());
+                updateNameDisplay();
+            }
+        };
+        updateNameDisplay();
+    }
+
     // Start het proces wanneer de pagina geladen is
-    document.addEventListener('DOMContentLoaded', populateSidebar);
+    document.addEventListener('DOMContentLoaded', () => {
+        populateSidebar();
+        initNameHandler();
+    });
   </script>
 </body>
 </html>
