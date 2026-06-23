@@ -1,9 +1,9 @@
---Opdracht Turing Machines 2025
+--Opdracht Turing Machines 2026
 --Structuur Tentamen
 Welkom bij Voortgezette Informatica
 Leerdoelen
 Schema lessen
 Eindige Automaten
---Push Down Automaten
+Push Down Automaten
 --Turing Machines
 --Onbeslisbaarheid

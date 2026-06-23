@@ -213,8 +213,9 @@
 
         function genExamples(data) {
             var filelist = '';
-            data = data.trim('\n');
-            examples = data.split('\n');
+            examples = data.split('\n')
+                           .map(line => line.trim())
+                           .filter(line => line && !line.startsWith('--'));
             for (var line of examples) {
               var ns = nameAndLink(line);
               filelist += `<div style="margin: 2px 0;"><a href="#" onclick="getDesAndCode('${ns[0]}')">${ns[1]}</a></div>`;
