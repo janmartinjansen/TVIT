@@ -1,0 +1,23 @@
+# Maak hier de opdracht Turing machines
+# Controleer je antwoord met Run en pas de naam met deel 1 en deel 2
+# Lever ieder deel apart in met de knop Inleveren (de inlevercode is tvit2026)
+
+# Maak hier deel 1 van de opdracht
+start 1
+
+
+
+tape 1
+tape 101
+tape 110
+tape 1000
+
+-----
+
+# Maak hier deel 2 van de opdracht 
+
+start 1
+
+
+tape 111-100
+tape 11111-1001

@@ -230,7 +230,7 @@
         const nameDisplay = document.getElementById('name-display');
         const nameAction = document.getElementById('name-action');
         if (storedName && storedName.trim() !== '') {
-            nameDisplay.textContent = storedName;
+            nameDisplay.textContent = (storedName === 'docentJMJ') ? 'docent' : storedName;
             nameAction.textContent = '[Wijzigen]';
         } else {
             nameDisplay.textContent = 'Niet ingesteld';

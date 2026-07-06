@@ -64,6 +64,20 @@
             background-color: #005fa3;
         }
 
+        .tab-buttons button.inlever-btn {
+            background-color: #28a745;
+            font-weight: bold;
+        }
+
+        .tab-buttons button.inlever-btn:hover {
+            background-color: #218838;
+        }
+
+        .tab-buttons button.inlever-btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
         .tab-content {
             border: 1px solid #ccc;
             padding: 10px;
@@ -100,14 +114,47 @@
 <body>
     <div id="container">
         <div id="sidebar">
+            <div id="name-container" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ccc;">
+              <span style="font-weight: bold; display: block; margin-bottom: 4px;">Studentnaam:</span>
+              <span id="name-display" style="color: #555;">Niet ingesteld</span>
+              <a href="#" id="name-action" style="font-size: 0.85em; color: #007acc; text-decoration: none; display: block; margin-top: 4px;">[Instellen]</a>
+              
+              <!-- Docent Toggle (alleen zichtbaar voor docentJMJ) -->
+              <div id="docent-toggle-container" style="margin-top: 10px; display: none; align-items: center; justify-content: space-between;">
+                <span style="font-weight: bold; font-size: 0.85em; color: #28a745;">Docent Modus:</span>
+                <input type="checkbox" id="docent-checkbox" onchange="toggleDocentMode()" style="cursor: pointer; transform: scale(1.1); margin-right: 4px; width: auto;">
+              </div>
+            </div>
+            <!-- Opdracht Ophalen Container -->
+            <div id="opdracht-retrieve-container" style="margin-bottom: 15px; display: none; padding-bottom: 10px; border-bottom: 1px solid #ccc;"></div>
+            <div id="home-link" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ccc;">
+              <a href="index.html" style="font-weight: bold; text-decoration: none; color: #007acc;">&larr; Home</a>
+            </div>
+            <div id="examples-container">
+              <div id="examples-list"></div>
+            </div>
+            <div id="saved-container" style="margin-top: 20px;">
+              <div id="saved-list"></div>
+            </div>
+            <div id="teacher-container" style="margin-top: 20px; display: none; padding-top: 10px; border-top: 1px solid #ccc;">
+              <h2>Inzendingen</h2>
+              <button id="fetch-teacher-btn" onclick="fetchSubmissionsTeacher()" style="width: 100%; padding: 8px; background-color: #007acc; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-bottom: 10px;">Inzendingen Laden</button>
+              <div id="teacher-list" style="margin-top: 10px; font-size: 0.9em; max-height: 250px; overflow-y: auto;"></div>
+              
+              <div id="teacher-releases" style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #ccc;">
+                <h3 style="font-size: 1.0em; margin-bottom: 8px;">Opdrachten vrijgeven</h3>
+                <div id="releases-list" style="font-size: 0.85em; max-height: 150px; overflow-y: auto;">Geen verborgen opdrachten.</div>
+              </div>
+            </div>
         </div>
         <div id="content">
             <div id="opgave" class="opgave-content">
                 <div class="tab-buttons" style="display: flex; justify-content: space-between; align-items: center;">
-                  <div>
+                  <div style="display: flex; align-items: center;">
                     <button onclick="openTabBes()">Beschrijving</button>
                     <button onclick="openTabCode()">Code</button>
                     <button onclick="openTabOutput()">Run</button>
+                    <button id="inlever-btn" class="inlever-btn" onclick="inleveren()" style="margin-left: 15px; display: none;">Inleveren</button>
                   </div>
                   <div id="opgave-buttons"></div>
                 </div>
@@ -153,12 +200,61 @@
             
         }
 
+        function getBaseAssignmentName(fullName) {
+            if (!fullName) return '';
+            if (fullName.includes(' (')) {
+                return fullName.split(' (')[0].trim();
+            }
+            return fullName;
+        }
+
+        function getAssignmentLabel(fullName) {
+            if (!fullName || !fullName.includes(' (')) return '';
+            const matches = fullName.match(/\(([^)]+)\)/);
+            if (matches && matches[1]) {
+                const label = matches[1].trim();
+                // Check of de label een automatische timestamp is (bijv. "2026-7-6 13:36:5")
+                const isTimestamp = /^\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{1,2}:\d{1,2}$/.test(label);
+                if (isTimestamp) {
+                    return '';
+                }
+                // Sanitiseer de label voor veilig gebruik in bestandsnaam
+                return label.toLowerCase()
+                            .replace(/[^a-z0-9_-]/g, '-')
+                            .replace(/-+/g, '-')
+                            .replace(/^-|-$/g, '');
+            }
+            return '';
+        }
+
+        function updateInleverBtnVisibility() {
+            const inleverBtn = document.getElementById('inlever-btn');
+            if (!inleverBtn) return;
+
+            const isOutputTabActive = document.getElementById('opgave-output').classList.contains('active');
+            
+            let isDeliverable = false;
+            if (current_assignment_name) {
+                const baseName = getBaseAssignmentName(current_assignment_name);
+                // Check of de huidige opgavennaam hoort bij een in te leveren opdracht
+                if (deliverable_assignments.has(baseName)) {
+                    isDeliverable = true;
+                }
+            }
+
+            if (isOutputTabActive && isDeliverable) {
+                inleverBtn.style.display = 'inline-block';
+            } else {
+                inleverBtn.style.display = 'none';
+            }
+        }
+
         function openTabBes() {
             let tabs = document.querySelectorAll(`#opgave .tab`);
             tabs.forEach(tab => tab.classList.remove('active'));
             document.getElementById(`opgave-beschrijving`).classList.add('active');
             document.getElementById("opgave-buttons").style.display = 'none';
-
+            updateInleverBtnVisibility();
         }
 
         function openTabCode() {
@@ -167,7 +263,8 @@
             document.getElementById(`opgave-code`).classList.add('active');
             editor.renderer.updateFull(true);
             document.getElementById("opgave-buttons").style.display = 'none';
-      }
+            updateInleverBtnVisibility();
+       }
 
         function openTabOutput() {
             let tabs = document.querySelectorAll(`#opgave .tab`);
@@ -176,54 +273,137 @@
             var newcode = editor.getValue();
             if (last_saved != newcode) {
               last_saved = newcode;
-              saved_code.set(genTimeStamp(newcode),newcode);
+              const baseName = getBaseAssignmentName(current_assignment_name) || "onbekend";
+              const key = `${baseName} (${genTimeStamp()})`;
+              saved_code.set(key, newcode);
               genSavedList();
               saveToParams(current_model,saved_code);
+              current_assignment_name = key; // Update direct de actieve naam naar de nieuwe snapshot
             }
             setDataSplit(newcode);
             document.getElementById("opgave-buttons").style.display = 'flex';
             genOpgaveButtons();
+            updateInleverBtnVisibility();
         }
+
+        var current_assignment_name = ''; // Actieve opgave traceren
+        var deliverable_assignments = new Set(); // Opslag voor in te leveren opgaven
+        var hidden_assignments = new Set();      // Opslag voor verborgen opgaven (**)
 
         function genSavedList() {
           var slist = '';
-          for (const k of saved_code.keys())
-            slist = `<div style="display:flex; align-items:center; font-size: 0.9em; gap: 4px;">
+          for (const k of saved_code.keys()) {
+            slist = `<div style="display:flex; align-items:center; font-size: 0.9em; gap: 4px; margin: 2px 0;">
               <span style="cursor:pointer; color:blue; font-size: 0.8em;" title="Verwijder" onclick="delItem('${k}')">&#x274C;</span>
               <span style="cursor:pointer; color:blue; font-size: 0.8em;" title="Hernoem" onclick="changeName('${k}')">&#x270F;&#xFE0F;</span>
               <a href="#" onclick="getSaved('${k}')">${k}</a>
            </div>` + slist;
-          slist = `<h2>Opgeslagen</h2>${slist}`
-          document.getElementById('sidebar').innerHTML = default_side + slist;
+          }
+          document.getElementById('saved-list').innerHTML = slist ? `<h2>Opgeslagen</h2>${slist}` : '';
         }
 
         function changeName(name) {
-          let newname = prompt("Rename:", name);
+          const baseName = getBaseAssignmentName(name);
+          const currentSuffix = name.includes(' (') ? name.split(' (')[1].slice(0, -1) : name;
+          let newname = prompt("Rename:", currentSuffix);
           if (newname != null && newname != "") {
-            // Verwijder alle single quotes uit de nieuwe naam.
-            const sanitizedName = newname.replaceAll("'", "");
+            // Verwijder alle single quotes en haakjes uit de nieuwe naam.
+            const sanitizedSuffix = newname.replaceAll("'", "").replaceAll("(", "").replaceAll(")", "");
+            const newKey = `${baseName} (${sanitizedSuffix})`;
 
             let content = saved_code.get(name);
             saved_code.delete(name);
-            saved_code.set(sanitizedName, content); // Gebruik de gesanitiseerde naam.
+            saved_code.set(newKey, content);
             genSavedList();
             saveToParams(current_model, saved_code);
+
+            // Als dit de momenteel actieve opgave was, update dan de naam en de knop-zichtbaarheid
+            if (current_assignment_name === name) {
+              current_assignment_name = newKey;
+              updateInleverBtnVisibility();
+            }
           }
         }
 
         function genExamples(data) {
+            deliverable_assignments.clear();
+            hidden_assignments.clear();
             var filelist = '';
-            examples = data.split('\n')
-                           .map(line => line.trim())
-                           .filter(line => line && !line.startsWith('--'));
-            for (var line of examples) {
-              var ns = nameAndLink(line);
-              filelist += `<div style="margin: 2px 0;"><a href="#" onclick="getDesAndCode('${ns[0]}')">${ns[1]}</a></div>`;
+            
+            const isTeacherMode = (localStorage.getItem('student_name') === 'docentJMJ' && localStorage.getItem('teacher_mode_enabled') === 'true');
+
+            // 1. Verzamel eerst alle verborgen opdrachten (**) uit de volledige rauwe data
+            const rawLines = data.split('\n').map(line => line.trim());
+            for (let line of rawLines) {
+              if (line.startsWith('**')) {
+                let cleanLine = line.substring(2).trim();
+                if (/---\s*inleveren\s*$/i.test(cleanLine)) {
+                  cleanLine = cleanLine.replace(/---\s*inleveren\s*$/i, '').trim();
+                }
+                const ns = nameAndLink(cleanLine);
+                const assignmentId = ns[0].split('.')[0];
+                hidden_assignments.add(assignmentId);
+              }
             }
-            const home = `<a href="index.html" class="button">Home</a><br>`
-            var links = `<h2>Voorbeelden</h2>${filelist}`
-            default_side = home + links;
-            document.getElementById('sidebar').innerHTML = default_side;
+
+            // 2. Filter en toon de voorbeelden/opgaven die zichtbaar mogen zijn
+            examples = rawLines.filter(line => {
+              if (!line) return false;
+              if (line.startsWith('--')) return false; // Altijd negeren
+              
+              if (line.startsWith('**')) {
+                // Strip '**' en check of dit specifieke bestand lokaal is vrijgegeven
+                let cleanLine = line.substring(2).trim();
+                if (/---\s*inleveren\s*$/i.test(cleanLine)) {
+                  cleanLine = cleanLine.replace(/---\s*inleveren\s*$/i, '').trim();
+                }
+                const ns = nameAndLink(cleanLine);
+                const assignmentId = ns[0].split('.')[0];
+                
+                // Zichtbaar als: het de docent is OF als de student de opdracht heeft vrijgegeven
+                return isTeacherMode || localStorage.getItem('visible_' + assignmentId) === 'true';
+              }
+              return true;
+            });
+
+            for (var line of examples) {
+              var isHidden = false;
+              if (line.startsWith('**')) {
+                line = line.substring(2).trim(); // Strip the '**'
+                const nsTemp = nameAndLink(line.replace(/---\s*inleveren\s*$/i, '').trim());
+                const assignmentId = nsTemp[0].split('.')[0];
+                
+                // Het is een verborgen opdracht. Als de student hem mag zien maar hij is eigenlijk '**',
+                // tonen we hem normaal voor de student. Maar de docent krijgt hem grijs/schuin te zien.
+                if (isTeacherMode) {
+                  isHidden = true;
+                }
+              }
+
+              var isDeliverable = false;
+              // Check of de regel eindigt op '--- inleveren' (case-insensitive, eventuele spaties genegeerd)
+              if (/---\s*inleveren\s*$/i.test(line)) {
+                isDeliverable = true;
+                line = line.replace(/---\s*inleveren\s*$/i, '').trim();
+              }
+              var ns = nameAndLink(line);
+              
+              const assignmentId = ns[0].split('.')[0];
+              if (isDeliverable) {
+                deliverable_assignments.add(assignmentId);
+              }
+              
+              if (isHidden) {
+                // Toon in het grijs/schuingedrukt
+                filelist += `<div style="margin: 2px 0;"><a href="#" onclick="getDesAndCode('${ns[0]}')" style="color: #888; font-style: italic;" title="Verborgen voor studenten">${ns[1]}</a></div>`;
+              } else {
+                filelist += `<div style="margin: 2px 0;"><a href="#" onclick="getDesAndCode('${ns[0]}')">${ns[1]}</a></div>`;
+              }
+            }
+            document.getElementById('examples-list').innerHTML = `<h2>Voorbeelden</h2>${filelist}`;
+            updateInleverBtnVisibility();
+            updateRetrieveButton();
+            updateTeacherReleasesPanel();
         }
 
         function nameAndLink(line) {
@@ -238,6 +418,8 @@
           editor.setValue(data,-1);
           last_saved = data;
           setDataSplit(data);
+          current_assignment_name = key; // Stel actieve opgave in op de opgeslagen naam
+          updateInleverBtnVisibility();
         }
 
         function delItem(key) {
@@ -245,6 +427,8 @@
           genSavedList();
           saveToParams(current_model,saved_code);
         }
+
+        var examples_raw_data = '';
 
         function getExamples() {
             fetch(current_model + '/examples.rm')
@@ -255,6 +439,7 @@
                     return response.text(); // Haal de inhoud als tekst op
                 })
                 .then(data => {
+                    examples_raw_data = data;
                     genExamples(data);
                     var firstitem = examples[0];
                     var ns = nameAndLink(firstitem);
@@ -267,8 +452,10 @@
         }
 
         function getDesAndCode(name) {
-            getOpgave(name.split('.')[0] + '.md');
+            current_assignment_name = name.split('.')[0];
+            getOpgave(current_assignment_name + '.md');
             getCode(name);
+            updateInleverBtnVisibility();
         }
 
         function getOpgave(name) {
@@ -390,8 +577,502 @@
           }
         }
 
+        // Functie om de docenten-toggle en het paneel bij te werken
+        function updateTeacherPanelVisibility() {
+          const storedName = localStorage.getItem('student_name');
+          const teacherEnabled = localStorage.getItem('teacher_mode_enabled') === 'true';
+          const urlParams = new URLSearchParams(window.location.search);
+          const hasUrlParam = urlParams.get('rol') === 'docent';
+
+          const teacherContainer = document.getElementById('teacher-container');
+          if (teacherContainer) {
+            if (hasUrlParam || (storedName === 'docentJMJ' && teacherEnabled)) {
+              teacherContainer.style.display = 'block';
+            } else {
+              teacherContainer.style.display = 'none';
+            }
+          }
+
+          // Ververs de voorbeeldenlijst om eventuele verborgen opgaven (**) te tonen/verbergen
+          if (typeof genExamples !== 'undefined' && examples_raw_data) {
+            genExamples(examples_raw_data);
+          }
+        }
+
+        function toggleDocentMode() {
+          const checkbox = document.getElementById('docent-checkbox');
+          if (checkbox) {
+            localStorage.setItem('teacher_mode_enabled', checkbox.checked ? 'true' : 'false');
+            updateTeacherPanelVisibility();
+          }
+        }
+
+        function updateRetrieveButton() {
+            const container = document.getElementById('opdracht-retrieve-container');
+            if (!container) return;
+            
+            const isTeacherMode = (localStorage.getItem('student_name') === 'docentJMJ' && localStorage.getItem('teacher_mode_enabled') === 'true');
+            if (isTeacherMode) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            let unactivated = [];
+            for (let id of hidden_assignments) {
+                if (localStorage.getItem('visible_' + id) !== 'true') {
+                    unactivated.push(id);
+                }
+            }
+            
+            if (unactivated.length > 0) {
+                container.innerHTML = `<button onclick="retrieveAssignments()" class="inlever-btn" style="width: 100%; font-size: 0.9em; padding: 8px; font-weight: bold; background-color: #28a745;">Opdracht ophalen</button>`;
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        async function retrieveAssignments() {
+            let submissionCode = localStorage.getItem('submission_code');
+            if (!submissionCode || submissionCode.trim() === '') {
+                submissionCode = prompt("Voer de eenmalige inlevercode in:");
+                if (!submissionCode || submissionCode.trim() === '') return;
+                localStorage.setItem('submission_code', submissionCode.trim());
+            }
+            
+            const btn = document.querySelector('#opdracht-retrieve-container button');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = "Controleren...";
+            }
+            
+            let activatedCount = 0;
+            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxWV1UzmfhJ0fbTaXPu-0WL7auw4dAwtYXdC4Sfoyc0gsuZ35sn5IDS_RxaVf9_RApA/exec';
+            
+            for (let id of hidden_assignments) {
+                if (localStorage.getItem('visible_' + id) !== 'true') {
+                    try {
+                        const response = await fetch(WEB_APP_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain' },
+                            body: JSON.stringify({
+                                action: "checkRelease",
+                                submissionCode: submissionCode,
+                                assignmentId: id
+                            })
+                        });
+                        const result = await response.json();
+                        if (result.status === "success" && result.released === true) {
+                            localStorage.setItem('visible_' + id, 'true');
+                            activatedCount++;
+                        }
+                    } catch (e) {
+                        console.error("Fout bij controleren release:", e);
+                    }
+                }
+            }
+            
+            if (activatedCount > 0) {
+                alert(`Er zijn ${activatedCount} nieuwe opdracht(en) succesvol opgehaald!`);
+                if (typeof getExamples === 'function') getExamples();
+            } else {
+                alert("Er zijn momenteel geen nieuwe opdrachten vrijgegeven door de docent.");
+            }
+            
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = "Opdracht ophalen";
+            }
+            updateRetrieveButton();
+        }
+
+        function updateTeacherReleasesPanel() {
+            const releasesList = document.getElementById('releases-list');
+            if (!releasesList) return;
+            
+            const isTeacherMode = (localStorage.getItem('student_name') === 'docentJMJ' && localStorage.getItem('teacher_mode_enabled') === 'true');
+            if (!isTeacherMode) return;
+            
+            if (hidden_assignments.size === 0) {
+                releasesList.innerHTML = '<div style="color: #666; font-style: italic;">Geen verborgen opdrachten.</div>';
+            } else {
+                releasesList.innerHTML = '';
+                for (let id of hidden_assignments) {
+                    const row = document.createElement('div');
+                    row.style.display = 'flex';
+                    row.style.alignItems = 'center';
+                    row.style.justifyContent = 'space-between';
+                    row.style.margin = '6px 0';
+                    row.innerHTML = `
+                        <span style="font-weight: bold; font-family: monospace;">${id}</span>
+                        <label style="display: flex; align-items: center; cursor: pointer; user-select: none;">
+                            <input type="checkbox" id="release-check-${id}" onchange="toggleRelease('${id}')" style="margin-right: 4px; width: auto; cursor: pointer; transform: scale(1.1);">
+                            Vrijgeven
+                        </label>
+                    `;
+                    releasesList.appendChild(row);
+                    loadReleaseStatusOnCheckbox(id);
+                }
+            }
+        }
+
+        async function loadReleaseStatusOnCheckbox(id) {
+            const checkbox = document.getElementById(`release-check-${id}`);
+            if (!checkbox) return;
+            
+            let submissionCode = localStorage.getItem('submission_code') || 'tvit2026';
+            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxWV1UzmfhJ0fbTaXPu-0WL7auw4dAwtYXdC4Sfoyc0gsuZ35sn5IDS_RxaVf9_RApA/exec';
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: "checkRelease",
+                        submissionCode: submissionCode,
+                        assignmentId: id
+                    })
+                });
+                const result = await response.json();
+                if (result.status === "success") {
+                    checkbox.checked = (result.released === true);
+                }
+            } catch (e) {
+                console.error("Fout bij ophalen release-status:", e);
+            }
+        }
+
+        async function toggleRelease(id) {
+            const checkbox = document.getElementById(`release-check-${id}`);
+            if (!checkbox) return;
+            
+            let submissionCode = localStorage.getItem('submission_code');
+            if (!submissionCode || submissionCode.trim() === '') {
+                submissionCode = prompt("Voer de inlevercode in:");
+                if (!submissionCode || submissionCode.trim() === '') {
+                    checkbox.checked = !checkbox.checked; // Revert
+                    return;
+                }
+                localStorage.setItem('submission_code', submissionCode.trim());
+            }
+            
+            checkbox.disabled = true;
+            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxWV1UzmfhJ0fbTaXPu-0WL7auw4dAwtYXdC4Sfoyc0gsuZ35sn5IDS_RxaVf9_RApA/exec';
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: "setRelease",
+                        submissionCode: submissionCode,
+                        studentName: localStorage.getItem('student_name'),
+                        assignmentId: id,
+                        visible: checkbox.checked
+                    })
+                });
+                const result = await response.json();
+                if (result.status !== "success") {
+                    alert("Fout bij instellen release: " + result.message);
+                    checkbox.checked = !checkbox.checked; // Revert
+                }
+            } catch (e) {
+                console.error("Fout bij toggle release:", e);
+                alert("Netwerkfout bij instellen release: " + e.message);
+                checkbox.checked = !checkbox.checked; // Revert
+            } finally {
+                checkbox.disabled = false;
+            }
+        }
+
+        // Functie om de naamweergave bij te werken
+        function updateNameDisplay() {
+            const storedName = localStorage.getItem('student_name');
+            const nameDisplay = document.getElementById('name-display');
+            const nameAction = document.getElementById('name-action');
+            if (nameDisplay && nameAction) {
+                if (storedName && storedName.trim() !== '') {
+                    nameDisplay.textContent = (storedName === 'docentJMJ') ? 'docent' : storedName;
+                    nameAction.textContent = '[Wijzigen]';
+                } else {
+                    nameDisplay.textContent = 'Niet ingesteld';
+                    nameAction.textContent = '[Instellen]';
+                }
+            }
+
+            // Beheer docenten-toggle visibility
+            const toggleContainer = document.getElementById('docent-toggle-container');
+            if (storedName === 'docentJMJ') {
+              if (toggleContainer) toggleContainer.style.display = 'flex';
+              const checkbox = document.getElementById('docent-checkbox');
+              if (checkbox) {
+                checkbox.checked = localStorage.getItem('teacher_mode_enabled') === 'true';
+              }
+            } else {
+              if (toggleContainer) toggleContainer.style.display = 'none';
+              localStorage.removeItem('teacher_mode_enabled');
+            }
+            updateTeacherPanelVisibility();
+        }
+
+        // Initialiseer naam-actie knop click handler
+        function initNameHandler() {
+            const nameAction = document.getElementById('name-action');
+            if (nameAction) {
+                nameAction.onclick = (e) => {
+                    e.preventDefault();
+                    const storedName = localStorage.getItem('student_name') || '';
+                    const inputName = prompt("Voer je naam in (optioneel):", storedName);
+                    if (inputName !== null) {
+                        localStorage.setItem('student_name', inputName.trim());
+                        updateNameDisplay();
+                    }
+                };
+            }
+            updateNameDisplay();
+        }
+
+        // Opslaan/inleveren naar Google Drive via de Web App
+        async function inleveren() {
+          const text = editor.getValue();
+          if (!text || text.trim() === '') {
+            alert("Er is geen code om in te leveren.");
+            return;
+          }
+
+          let studentName = localStorage.getItem('student_name');
+          if (!studentName || studentName.trim() === '') {
+            studentName = prompt("Voer eerst je naam in om je werk in te leveren:");
+            if (!studentName || studentName.trim() === '') {
+              alert("Inleveren geannuleerd: naam is verplicht.");
+              return;
+            }
+            localStorage.setItem('student_name', studentName.trim());
+            updateNameDisplay();
+          }
+
+          // Controleer en vraag eenmalig om de inlevercode
+          let submissionCode = localStorage.getItem('submission_code');
+          if (!submissionCode || submissionCode.trim() === '') {
+            submissionCode = prompt("Voer de eenmalige inlevercode in:");
+            if (!submissionCode || submissionCode.trim() === '') {
+              alert("Inleveren geannuleerd: inlevercode is verplicht.");
+              return;
+            }
+            localStorage.setItem('submission_code', submissionCode.trim());
+          }
+
+          const baseName = getBaseAssignmentName(current_assignment_name) || "onbekend";
+          const label = getAssignmentLabel(current_assignment_name);
+          const assignmentName = label ? `${baseName}_${label}` : baseName;
+          const component = current_model || "onbekend";
+
+          const inleverBtn = document.getElementById('inlever-btn');
+          const originalText = inleverBtn.textContent;
+          inleverBtn.disabled = true;
+          inleverBtn.textContent = "Inleveren...";
+
+          // Web App URL van Apps Script
+          const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxWV1UzmfhJ0fbTaXPu-0WL7auw4dAwtYXdC4Sfoyc0gsuZ35sn5IDS_RxaVf9_RApA/exec';
+
+          try {
+            const response = await fetch(WEB_APP_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'text/plain' // Voorkomt OPTIONS preflight CORS issues
+              },
+              body: JSON.stringify({
+                text: text,
+                studentName: studentName,
+                assignmentName: assignmentName,
+                component: component,
+                submissionCode: submissionCode
+              })
+            });
+
+            const result = await response.json();
+            if (result.status === "success") {
+              alert(`Je werk is succesvol ingeleverd!\nBestand: ${result.fileName}`);
+            } else {
+              alert("Inleveren mislukt: " + (result.message || "onbekende fout"));
+              // Als de code fout is, wis deze dan zodat er de volgende keer opnieuw om gevraagd wordt
+              if (result.message && (result.message.toLowerCase().includes("inlevercode") || result.message.toLowerCase().includes("geautoriseerd"))) {
+                localStorage.removeItem('submission_code');
+              }
+            }
+          } catch (error) {
+            console.error("Fout bij inleveren:", error);
+            alert("Fout bij communicatie met de inlever-server: " + error.message + 
+              "\n\nTip: Zorg ervoor dat de Web App in Google Apps Script correct is geïmplementeerd en de juiste rechten heeft.");
+          } finally {
+            inleverBtn.disabled = false;
+            inleverBtn.textContent = originalText;
+          }
+        }
+
+        // --- Docentenfunctionaliteit ---
+        
+        // Controleer of de rol van docent actief is op basis van de URL parameters of gebruikersinstelling
+        function initTeacherPanel() {
+          updateTeacherPanelVisibility();
+        }
+
+        // Inzendingen ophalen voor docent
+        async function fetchSubmissionsTeacher() {
+          let submissionCode = localStorage.getItem('submission_code');
+          if (!submissionCode || submissionCode.trim() === '') {
+            submissionCode = prompt("Voer de inlevercode in:");
+            if (!submissionCode || submissionCode.trim() === '') {
+              alert("Laden geannuleerd: code is verplicht.");
+              return;
+            }
+            localStorage.setItem('submission_code', submissionCode.trim());
+          }
+
+          const btn = document.getElementById('fetch-teacher-btn');
+          const originalText = btn.textContent;
+          btn.disabled = true;
+          btn.textContent = "Laden...";
+
+          const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxWV1UzmfhJ0fbTaXPu-0WL7auw4dAwtYXdC4Sfoyc0gsuZ35sn5IDS_RxaVf9_RApA/exec';
+
+          try {
+            const response = await fetch(WEB_APP_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'text/plain'
+              },
+              body: JSON.stringify({
+                action: "list",
+                submissionCode: submissionCode,
+                studentName: localStorage.getItem('student_name')
+              })
+            });
+
+            const result = await response.json();
+            if (result.status === "success") {
+              btn.textContent = "Inzendingen Vernieuwen";
+              displaySubmissionsTeacher(result.files);
+            } else {
+              alert("Fout bij laden: " + result.message);
+              if (result.message && (result.message.toLowerCase().includes("inlevercode") || result.message.toLowerCase().includes("geautoriseerd"))) {
+                localStorage.removeItem('submission_code');
+              }
+            }
+          } catch (error) {
+            console.error("Fout bij laden:", error);
+            alert("Fout bij laden van inzendingen: " + error.message);
+          } finally {
+            btn.disabled = false;
+          }
+        }
+
+        // Inzendingen filteren en weergeven in de zijbalk
+        function displaySubmissionsTeacher(files) {
+          const listDiv = document.getElementById('teacher-list');
+          listDiv.innerHTML = '';
+
+          // Filter bestanden die bij deze module (current_model) horen
+          const filtered = files.filter(f => f.component === current_model);
+
+          if (filtered.length === 0) {
+            listDiv.innerHTML = '<div style="color: #666; font-style: italic;">Geen inzendingen voor deze module.</div>';
+            return;
+          }
+
+          filtered.forEach(file => {
+            // Parse naam en opgave uit bestandsnaam (bijv. Jan_Jansen_intro_2026-07-05_14-15-22.txt)
+            const baseName = file.name.replace(/\.txt$/, '');
+            const parts = baseName.split('_');
+            
+            let displayName = baseName;
+            let student = "Onbekend";
+            let opgave = "Opgave";
+            let dateStr = "";
+
+            if (parts.length >= 3) {
+              student = parts[0];
+              opgave = parts[1];
+              const dateParts = parts.slice(2);
+              if (dateParts.length >= 2) {
+                dateStr = `${dateParts[0]} ${dateParts[1].replaceAll('-', ':')}`;
+              }
+              displayName = `<strong>${student}</strong> - ${opgave}`;
+            }
+
+            const item = document.createElement('div');
+            item.style.margin = "8px 0";
+            item.style.padding = "6px";
+            item.style.border = "1px solid #ddd";
+            item.style.borderRadius = "4px";
+            item.style.backgroundColor = "#fff";
+            item.style.fontSize = "0.85em";
+            item.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
+
+            item.innerHTML = `
+              <div style="cursor: pointer; color: #007acc; font-weight: 500;" onclick="loadSubmissionTeacher('${file.id}', '${student}', '${opgave}')">
+                ${displayName}
+              </div>
+              <div style="font-size: 0.8em; color: #666; margin-top: 2px;">
+                ${dateStr || new Date(file.created).toLocaleString('nl-NL')}
+              </div>
+            `;
+            listDiv.appendChild(item);
+          });
+        }
+
+        // Inzending inladen in editor
+        async function loadSubmissionTeacher(fileId, student, opgave) {
+          const submissionCode = localStorage.getItem('submission_code');
+          if (!submissionCode) return;
+
+          const listDiv = document.getElementById('teacher-list');
+          const originalHTML = listDiv.innerHTML;
+          listDiv.innerHTML = '<div style="color: #666; font-style: italic;">Inzending laden...</div>';
+
+          const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxWV1UzmfhJ0fbTaXPu-0WL7auw4dAwtYXdC4Sfoyc0gsuZ35sn5IDS_RxaVf9_RApA/exec';
+
+          try {
+            const response = await fetch(WEB_APP_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'text/plain'
+              },
+              body: JSON.stringify({
+                action: "read",
+                fileId: fileId,
+                submissionCode: submissionCode,
+                studentName: localStorage.getItem('student_name')
+              })
+            });
+
+            const result = await response.json();
+            if (result.status === "success") {
+              editor.setValue(result.text, -1);
+              last_saved = result.text;
+              setDataSplit(result.text);
+              
+              // Stel actieve opgave naam in voor eventueel bewerken & nakijken
+              current_assignment_name = `${student}_${opgave}_nagekeken`;
+              
+              // Switch direct naar de Code-tab
+              openTabCode();
+              
+              alert(`Inzending van ${student} voor ${opgave} succesvol ingeladen in de editor!`);
+            } else {
+              alert("Fout bij laden van inhoud: " + result.message);
+            }
+          } catch (error) {
+            console.error("Fout bij laden:", error);
+            alert("Netwerkfout bij inladen: " + error.message);
+          } finally {
+            // Herstel de originele lijstweergave in de zijbalk zonder deze opnieuw te downloaden
+            listDiv.innerHTML = originalHTML;
+          }
+        }
+
         getExamples();
         showContent();
+        initNameHandler();
+        initTeacherPanel();
  
     </script>
 </body>
