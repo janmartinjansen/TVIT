@@ -2,5 +2,6 @@
 
 De opdrachten staan onder Turing
 
-Opdracht Turing Machine
-Bonus Opdracht Turing Machine
+- Opdracht Turing Machine
+
+- Bonus Opdracht Turing Machine
