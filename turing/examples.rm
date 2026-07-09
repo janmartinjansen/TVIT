@@ -3,5 +3,6 @@ vbturing2.tur --- Macht van 2
 --oefenen.tur --- Oefenen Palindroom
 palindroom.tur --- Voorbeeld Palindroom
 opgaven.tur --- Opgaven Turing Machines
-**opdracht2026.tur --- Opdracht Turing Machines --- inleveren
-**opdracht2026_bonus.tur --- Bonus opdracht Turing Machines --- inleveren
+opdracht2026.tur --- Opdracht Turing Machines --- inleveren
+opdracht2026_bonus.tur --- Bonus opdracht Turing Machines Omkeren --- inleveren
+opdracht2026_bonus2.tur --- Bonus opdracht Turing Machines Binair Optellen --- inleveren

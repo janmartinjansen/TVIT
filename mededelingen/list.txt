@@ -7,3 +7,4 @@ Eindige Automaten
 Push Down Automaten
 Turing Machines
 Onbeslisbaarheid
+Opmerking Simulator

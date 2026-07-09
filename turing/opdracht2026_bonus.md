@@ -1,6 +1,4 @@
-## Bonus opgave Turing machine
-Voor als je tijd en zin overhebt (mag later ingeleverd worden).
-
+## Bonus opgave Turing machine Omkeren
 
 De invoer bestaat uit een string van 0 en 1.
 Keer deze string om (zie voorbeelden).

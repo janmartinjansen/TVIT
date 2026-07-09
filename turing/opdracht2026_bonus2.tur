@@ -1,11 +1,11 @@
-# Maak hier de bonus opdracht Turing machines Omkeren
+# Maak hier de bonus opdracht Turing machines Binair Optellen
 # Controleer je antwoord met Run
 # Lever met de knop Inleveren (de inlevercode is tvit2026)
-# Naam: 
+# Naam:
 
 start 1
 
 
 
-tape 1100
-tape 11101
+tape !101#0111
+tape !10#101
