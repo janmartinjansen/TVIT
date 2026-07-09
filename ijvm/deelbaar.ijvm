@@ -1,0 +1,27 @@
+# maak hier de opgaven
+
+    bipush 3
+    bipush 12
+    call 2 1 11
+    print 
+    stop
+11  bipush 0
+    istore 2
+22  iload 2
+    iload 1
+    isub
+    iflt 44
+    goto 33
+44  iload 0
+    iload 2
+    iadd
+    istore 2
+    goto 22
+33  iload 1
+    iload 2
+    isub
+    ifeq 55
+    bipush 0
+    ireturn
+55  bipush 1
+    ireturn

@@ -27,7 +27,7 @@ Wordt vertaald naar de volgende code:
     bipush 3
     call 1 2 11
     bipush 3
-    call 2 1 22
+    call 2 1 44
     pop 
     stop
 11  iload 0
@@ -53,5 +53,14 @@ Wordt vertaald naar de volgende code:
     istore 2
     goto 22
 33  iload 1
+    ireturn
+44  bipush 0
+    istore 2
+    iload 0
+    iload 2
+    isub
+    iflt 66
+    goto 44
+66  iload 1
     ireturn
 ```

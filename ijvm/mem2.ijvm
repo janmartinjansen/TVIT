@@ -30,4 +30,3 @@
     goto 22
 33  iload 1
     ireturn
-44  

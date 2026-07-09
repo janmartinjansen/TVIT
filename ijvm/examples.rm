@@ -10,4 +10,5 @@ fibonacci.ijvm --- Fibonacci functie
 ggd.ijvm --- Grootste gemene deler
 hanoi.ijvm --- Torens van Hanoi
 selsort.ijvm --- Selection sort
+deelbaar.ijvm --- Deelbaar opgave
 opgaven.ijvm --- Opgaven
