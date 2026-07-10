@@ -40,7 +40,8 @@ p x = halt p x loop stop
 # we moeten een truc uithalen in de definitie van p
 # dit doen we als volgt, we definieren eerst een andere functie d:
 
-d f x = halt f x loop stop
+e y   = halt y y loop stop        -- e is UNAIR, y wordt zowel als "programma" als "input" gebruikt
+d f x = halt f x loop stop.       -- foute versie
 
 # let op de gelijkenis met p, we hebben alleen een extra argument f (denk aan de fixpoint definitie voor recursie, die gebruikt dezelfde truc!)
 # let op: f moet wel een representatie van een functie zijn, omdat halt nu werkt op representaties!
@@ -48,18 +49,21 @@ d f x = halt f x loop stop
 
 # bekijk nu: 
 
-d rep_d rep_d
+e rep_e 
+d rep_d rep_d                     -- foute versie
 
 # dit is een zinnige uitdrukking omdat rep_d een representatie is, zoals hierboven vereist
 
 # vul dit in, in de definitie van d
 
-d rep_d rep_d = halt rep_d rep_d loop stop
+d rep_d rep_d = halt rep_d rep_d loop stop      -- foute versie
+e rep_e       = halt rep_e rep_e loop stop
+
 
 # er zijn nu twee opties: 
 
-# halt rep_d rep_d = True  => d rep_d rep_d = loop en termineert dus niet, maar dan had halt rep_d x dus False moeten opleveren
-# halt rep_d rep_d = False => d rep_d rep_d = stop en termineert dus wel,  maar dan had halt rep_d x dus True  moeten opleveren
+# halt rep_e rep_e = True  => e rep_e = loop en termineert dus niet, maar dan had halt rep_e rep_e dus False moeten opleveren
+# halt rep_e rep_e = False => e rep_e = stop en termineert dus wel,  maar dan had halt rep_e rep_e dus True  moeten opleveren
 
 # in beide gevallen is er sprake van een tegenspraak => halt kan niet bestaan!
 
