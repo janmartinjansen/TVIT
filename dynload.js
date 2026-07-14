@@ -21,6 +21,8 @@
           chainLoads(['pyodide','pyodideshell'],0,initPyodide); 
         else if (componentNaam == 'autopython') 
           chainLoads(['pyodide','autopython'],0,initPyodide); 
+        else if (componentNaam == 'vraag')
+          chainLoads(['vraag'],0,initVraagCallback);
       }
       else {
         console.log('Geen component parameter gevonden in de URL.');
@@ -91,5 +93,13 @@
       document.getElementById('outputOpgave').innerHTML = '<pyodide-shell></pyodide-shell>';
       //console.log(document.getElementById('outputOpgave'));
       //setData(vbtm2);
+    }
+
+    function initVraagCallback() {
+      if (typeof initVraag === 'function') {
+        initVraag();
+      } else {
+        console.error("initVraag niet gedefinieerd in vraag.js");
+      }
     }
     //    <script language="javascript" type="text/javascript" src="./turing.js"></script>

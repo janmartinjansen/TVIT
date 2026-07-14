@@ -242,8 +242,18 @@
                 }
             }
 
+            // In de vraag-module tonen we de instuurknop alleen als de student een nieuwe vraag schrijft (geen actieve file bewerkt)
+            if (current_model === 'vraag' && typeof active_question_file_id !== 'undefined' && active_question_file_id !== null) {
+                isDeliverable = false;
+            }
+
             if (isOutputTabActive && isDeliverable) {
                 inleverBtn.style.display = 'inline-block';
+                if (current_model === 'vraag') {
+                    inleverBtn.textContent = 'Vraag insturen';
+                } else {
+                    inleverBtn.textContent = 'Inleveren';
+                }
             } else {
                 inleverBtn.style.display = 'none';
             }
@@ -543,14 +553,22 @@
           // const nextBtn = document.getElementById("nextexample");
           // if (multi_example && output_active && nextBtn) nextBtn.style.display = 'inline';
           // else if (nextBtn) nextBtn.style.display = 'none';
-          setData(opgaven[0]);
+          if (typeof setData === 'function') {
+            setData(opgaven[0]);
+          } else {
+            console.warn("setData is nog niet geladen.");
+          }
           current_opgave = 0;
           genOpgaveButtons();
         }
 
         function nextOpgave() {
           current_opgave = (current_opgave + 1) % opgaven.length;
-          setData(opgaven[current_opgave]);
+          if (typeof setData === 'function') {
+            setData(opgaven[current_opgave]);
+          } else {
+            console.warn("setData is nog niet geladen.");
+          }
         }
 
         function genOpgaveButtons() {
@@ -858,17 +876,31 @@
               return;
             }
             localStorage.setItem('submission_code', submissionCode.trim());
-          }
-
-          const baseName = getBaseAssignmentName(current_assignment_name) || "onbekend";
+          }          const baseName = getBaseAssignmentName(current_assignment_name) || "onbekend";
           const label = getAssignmentLabel(current_assignment_name);
           const assignmentName = label ? `${baseName}_${label}` : baseName;
           const component = current_model || "onbekend";
 
+          let finalAssignmentName = assignmentName;
+          let fileIdToUpdate = null;
+          if (component === "vraag") {
+            if (typeof active_question_file_id !== 'undefined' && active_question_file_id) {
+              fileIdToUpdate = active_question_file_id;
+              const isTeacherMode = (localStorage.getItem('student_name') === 'docentJMJ' && localStorage.getItem('teacher_mode_enabled') === 'true');
+              if (isTeacherMode) {
+                finalAssignmentName = "Vraag_BEANTWOORD";
+              } else {
+                finalAssignmentName = "Vraag_OPEN";
+              }
+            } else {
+              finalAssignmentName = "Vraag_OPEN";
+            }
+          }
+
           const inleverBtn = document.getElementById('inlever-btn');
           const originalText = inleverBtn.textContent;
           inleverBtn.disabled = true;
-          inleverBtn.textContent = "Inleveren...";
+          inleverBtn.textContent = (component === "vraag") ? "Insturen..." : "Inleveren...";
 
           // Web App URL van Apps Script
           const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxWV1UzmfhJ0fbTaXPu-0WL7auw4dAwtYXdC4Sfoyc0gsuZ35sn5IDS_RxaVf9_RApA/exec';
@@ -882,17 +914,30 @@
               body: JSON.stringify({
                 text: text,
                 studentName: studentName,
-                assignmentName: assignmentName,
+                assignmentName: finalAssignmentName,
                 component: component,
-                submissionCode: submissionCode
+                submissionCode: submissionCode,
+                fileId: fileIdToUpdate
               })
             });
 
             const result = await response.json();
             if (result.status === "success") {
-              alert(`Je werk is succesvol ingeleverd!\nBestand: ${result.fileName}`);
+              alert(component === "vraag" ? "Uw vraag/antwoord is succesvol verstuurd!" : `Je werk is succesvol ingeleverd!\nBestand: ${result.fileName}`);
+              
+              if (component === "vraag") {
+                editor.setValue("// Typ hier uw vraag aan de docent...\n", -1);
+                if (typeof active_question_file_id !== 'undefined') {
+                  active_question_file_id = null;
+                  const answerPanel = document.getElementById('vraag-answer-panel');
+                  if (answerPanel) answerPanel.style.display = 'none';
+                }
+                if (typeof loadQuestionsList === 'function') {
+                  loadQuestionsList();
+                }
+              }
             } else {
-              alert("Inleveren mislukt: " + (result.message || "onbekende fout"));
+              alert("Insturen mislukt: " + (result.message || "onbekende fout"));
               // Als de code fout is, wis deze dan zodat er de volgende keer opnieuw om gevraagd wordt
               if (result.message && (result.message.toLowerCase().includes("inlevercode") || result.message.toLowerCase().includes("geautoriseerd"))) {
                 localStorage.removeItem('submission_code');
