@@ -3,6 +3,12 @@ var active_question_file_id = null;
 function initVraag() {
   console.log('Vraag-component geladen!');
   
+  // Verberg het 'Opgeslagen' (saved-container) paneel in de zijbalk voor deze module
+  const savedContainer = document.getElementById('saved-container');
+  if (savedContainer) {
+    savedContainer.style.display = 'none';
+  }
+  
   // Voeg css-stijlen toe aan de head als ze er nog niet zijn
   if (!document.getElementById('vraag-styles')) {
     const style = document.createElement('style');
